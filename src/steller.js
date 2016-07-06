@@ -48,6 +48,8 @@ const Steller = {
                 });
             });
 
+            this.objects = Steller.utils.lightMerge(this.objects, _.get(options, 'characters', {}));
+
             // prepare objects
             this.objects = _.mapValues(this.objects, (o, name) => {
                 return Steller.utils.lightMerge(o, {

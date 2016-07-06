@@ -115,6 +115,11 @@ function makeGame (onlyObject=false) {
                 }
             }
         },
+        characters: {
+            character1: {
+                name: 'Character 1'
+            }
+        },
         vars: {
             var3: 3
         }
@@ -155,6 +160,15 @@ describe('Steller game', function() {
         assert.equal(game.state.main.actions[0].name, 'Wait');
 
     });
+
+    it('should merge characters into objects', () => {
+        const game = makeGame();
+        game.run();
+
+        assert.isTrue(_.keys(game.objects).includes('character1'));
+        assert.equal(_.keys(game.objects).length, 4);
+    });
+
 
     it('should move in the invetory all objects in options.inventory', () => {
         const gameObject = makeGame(true);
@@ -511,8 +525,9 @@ describe('Steller game', function() {
     it('should be able to save and restore a game', () => {
         const expected = {
             locationVars: { location1: { var1: 1 }, location2: {} },
-            objectVars: { object1: { var2: 2 }, object2: {}, object3: {} },
+            objectVars: { character1: {}, object1: { var2: 2 }, object2: {}, object3: {} },
             objectLocations: {
+                character1: null,
                 object1: '__inventory__',
                 object2: 'location1',
                 object3: 'location1'
@@ -555,7 +570,7 @@ describe('Steller game', function() {
         assert.equal(game._currentLocation, 'location2');
         assert.equal(game.state.inventory.objects.length, 1);
 
-        assert.equal(game.save(true), '{"locationVars":{"location1":{"var1":1},"location2":{}},"objectVars":{"object1":{"var2":2},"object2":{},"object3":{}},"objectLocations":{"object1":"__inventory__","object2":"location1","object3":"location1"},"vars":{"var3":3},"currentLocation":"location2","score":42,"state":{"out":{"texts":[{"text":"Here the adventure begins","type":"normal"},{"text":"before move","type":"normal"},{"text":"take the object","type":"command"},{"text":"Taken","type":"normal"},{"text":"after move","type":"normal"},{"text":"North","type":"command"},{"text":42,"type":"score"},{"text":"save","type":"command"},{"text":"Restored","type":"normal"},{"text":"save","type":"command"}]}}}');
+        assert.equal(game.save(true), '{"locationVars":{"location1":{"var1":1},"location2":{}},"objectVars":{"object1":{"var2":2},"object2":{},"object3":{},"character1":{}},"objectLocations":{"object1":"__inventory__","object2":"location1","object3":"location1","character1":null},"vars":{"var3":3},"currentLocation":"location2","score":42,"state":{"out":{"texts":[{"text":"Here the adventure begins","type":"normal"},{"text":"before move","type":"normal"},{"text":"take the object","type":"command"},{"text":"Taken","type":"normal"},{"text":"after move","type":"normal"},{"text":"North","type":"command"},{"text":42,"type":"score"},{"text":"save","type":"command"},{"text":"Restored","type":"normal"},{"text":"save","type":"command"}]}}}');
 
         game = makeGame();
         game.run();
