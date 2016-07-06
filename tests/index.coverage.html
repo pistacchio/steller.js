@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Mocha Tests</title>
+        <link href="../node_modules/mocha/mocha.css" rel="stylesheet" />
+        <script src="../node_modules/mocha/mocha.js"></script>
+        <script src="../node_modules/chai/chai.js"></script>
+        <script src="../node_modules/babel-polyfill/dist/polyfill.min.js"></script>
+
+
+        <script src="../dist/jquery.js"></script>
+        <script src="../dist/lodash.js"></script>
+        <script src="../tests/steller.es5.js"></script>
+        <script src="../tests/steller.web.es5.ins.js"></script>
+        <script>
+            mocha.setup('bdd');
+        </script>
+    </head>
+    <body>
+        <div id="mocha"></div>
+        <div style="display: none;" id="container"></div>
+
+        <script src="tests.web.es5.js"></script>
+
+        <script>
+            mocha.checkLeaks();
+            mocha.globals(['jQuery']);
+            mocha.run();
+        </script>
+
+    </body>
+</html>
