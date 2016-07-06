@@ -61,6 +61,10 @@ const Steller = {
             });
 
             this.properties = Steller.utils.lightMerge(Steller.DefaultProperties, this.properties);
+
+            for (let object of _.get(options, 'inventory', [])) {
+                this.objects[object].location = Steller.INVENTORY;
+            }
         }
 
         get currentLocation () { return this.locations[this._currentLocation]; }

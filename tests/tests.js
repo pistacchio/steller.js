@@ -1,8 +1,8 @@
 const Steller = require('../src/steller.js');
 const assert = require('chai').assert;
 
-function makeGame () {
-    let game =  new Steller.Game({
+function makeGame (onlyObject=false) {
+    let gameObject = {
         initialMessage: 'Here the adventure begins',
         title: 'My adventure',
         score: 0,
@@ -118,8 +118,11 @@ function makeGame () {
         vars: {
             var3: 3
         }
-    });
+    };
 
+    if (onlyObject) return gameObject;
+
+    let game =  new Steller.Game(gameObject);
     return game;
 }
 
@@ -152,6 +155,21 @@ describe('Steller game', function() {
 
     });
 
+    it('should move in the invetory all objects in options.inventory', () => {
+        const gameObject = makeGame(true);
+        gameObject.objects.object4 = {
+            name: 'Object 4'
+        };
+        gameObject.inventory = [
+            'object4'
+        ];
+        const game = new Steller.Game(gameObject);
+        game.run();
+
+        assert.isTrue(game.objectInInventory('object4'));
+        assert.equal(_.keys(game.objectsInInventory()).length, 1);
+    });
+
     it('should move between locations', () => {
         const game = makeGame();
         game.run();
@@ -179,8 +197,6 @@ describe('Steller game', function() {
             ]}
         );
         assert.equal(game.state.main.name, 'Second location');
-
-
     });
 
     it('should execute location actions', () => {
