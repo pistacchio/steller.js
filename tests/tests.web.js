@@ -2,7 +2,7 @@ const assert = chai.assert;
 
 function makeGame () {
     var game =  new Steller.Web.Game({
-        initialMessage: 'Here the adventure begins',
+        initialText: 'Here the adventure begins',
         title: 'My adventure',
         score: 42,
         locations: {
@@ -35,7 +35,7 @@ function makeGame () {
                     talkable: {
                         topics: {
                             'Weather': {
-                                message: 'Wow, il rains!'
+                                text: 'Wow, il rains!'
                             }
                         }
                     }

@@ -6,7 +6,7 @@ const Steller = {
     Game: class {
         constructor (options) {
             this.lang              = _.get(options, 'lang', 'en');
-            this.initialMessage    = _.get(options, 'initialMessage', '');
+            this.initialText    = _.get(options, 'initialText', '');
             this.locations         = _.get(options, 'locations', {});
             this.objects           = _.get(options, 'objects', {});
             this._currentLocation  = _.get(options, 'currentLocation', null);
@@ -26,7 +26,7 @@ const Steller = {
                 footer:    {},
                 main:      {},
                 out:       {
-                    messages: []
+                    texts: []
                 },
                 action:    {},
                 inventory: {
@@ -79,7 +79,7 @@ const Steller = {
                 score: this.score
             };
 
-            this.print(this.initialMessage);
+            this.print(this.initialText);
             this.refreshOutput();
         }
 
@@ -92,7 +92,7 @@ const Steller = {
             for (let action in actions) {
                 outputActions.push({
                     name: action,
-                    message: () => {
+                    text: () => {
                         this.printCommand(action);
                         this.print(actions[action]);
                     }
@@ -106,7 +106,7 @@ const Steller = {
             for (let exit in exits) {
                 outputExits.push({
                     name: exit,
-                    message: () => {
+                    text: () => {
                         this.gotoLocation(exits[exit], exit);
                     }
                 });
@@ -142,10 +142,10 @@ const Steller = {
                         properties[property] = Steller.utils.lightMerge(obj.properties[propertyName], properties[property]);
                         properties[property] = Steller.utils.lightMerge(properties[property], {
                             command:       '',
-                            message:       '',
+                            text:          '',
                             available:     true,
-                            beforeMessage: () => '',
-                            afterMessage:  () => ''
+                            beforeText:    () => '',
+                            afterText:     () => ''
                         });
                     }
                     availableActions = Steller.utils.lightMerge(availableActions, properties);
@@ -156,11 +156,11 @@ const Steller = {
                 actions = _.map(availableActions, (action, actionName) => {
                     return {
                         name: actionName,
-                        message: () => {
-                            if (action.hasOwnProperty('beforeMessage')) action.beforeMessage();
+                        text: () => {
+                            if (action.hasOwnProperty('beforeText')) action.beforeText();
                             self.printCommand(action.command);
-                            self.print(action.message);
-                            if (action.hasOwnProperty('afterMessage')) action.afterMessage();
+                            self.print(action.text);
+                            if (action.hasOwnProperty('afterText')) action.afterText();
                         }
                     };
                 });
@@ -173,17 +173,17 @@ const Steller = {
             };
         }
 
-        print (message, type) {
+        print (text, type) {
             this.state.out = {
-                messages: this.state.out.messages.concat([{
-                    message: message,
+                texts: this.state.out.texts.concat([{
+                    text: text,
                     type: type || 'normal'
                 }])
             }
         }
 
-        printCommand (message) {
-            this.print(message, 'command');
+        printCommand (text) {
+            this.print(text, 'command');
             this.everyturn();
         }
 
@@ -284,7 +284,7 @@ const Steller = {
                 score: this.score,
                 state: {
                     out: {
-                        messages: this.state.out.messages
+                        texts: this.state.out.texts
                     }
                 }
             };
@@ -308,7 +308,7 @@ const Steller = {
             this.vars = data.vars;
             this._currentLocation = data.currentLocation;
             this.score = data.score;
-            this.state.out.messages = data.state.out.messages;
+            this.state.out.texts = data.state.out.texts;
             this.state.locked = false;
             this.refreshOutput();
             this.print(this.texts.RESTORED);
@@ -351,7 +351,7 @@ const Steller = {
 
                         return game.objectInInventory(obj.id) ? game.texts.properties.movable.DROP.toLowerCase() : game.texts.properties.movable.TAKE.toLowerCase();
                     },
-                    get message () {
+                    get text () {
                         if (game.objectInInventory(obj.id)) {
                             game.moveObjectToLocation(obj.id);
                             return game.texts.properties.movable.DROPPED;
@@ -374,7 +374,7 @@ const Steller = {
                             return game.texts.properties.usableWith.USE
                         }
                     },
-                    get message () {
+                    get text () {
                         const self = this;
                         let actions = [];
                         let availableObjects = Steller.utils.lightMerge(game.objectsInLocation(), game.objectsInInventory());
@@ -385,19 +385,19 @@ const Steller = {
                         for (let object in availableObjects) {
                             actions.push({
                                 name: availableObjects[object].name,
-                                message () {
+                                text () {
                                     let command = Steller.utils.translate(game.texts.properties.usableWith.USE_WITH_OBJ, obj.name, availableObjects[object].name);
-                                    let message = game.texts.properties.usableWith.NOTHING;
+                                    let text = game.texts.properties.usableWith.NOTHING;
 
                                     if (interactions.hasOwnProperty(object)) {
                                         if (interactions[object].hasOwnProperty('command')) command = interactions[object].command;
-                                        if (interactions[object].hasOwnProperty('message')) message = interactions[object].message;
+                                        if (interactions[object].hasOwnProperty('text')) text = interactions[object].text;
                                     } else {
-                                        if (interactions.hasOwnProperty('default')) message = interactions.default;
+                                        if (interactions.hasOwnProperty('default')) text = interactions.default;
                                     }
 
                                     game.printCommand(command);
-                                    game.print(message);
+                                    game.print(text);
                                     game.unlockInteraction();
                                     game.state.action = {};
                                 }
@@ -409,7 +409,7 @@ const Steller = {
                             title: self.hasOwnProperty('title') ? self.title : game.texts.properties.usableWith.USE_WITH,
                             actions: actions
                         }
-                        return self.hasOwnProperty('usingMessage') ? self.usingMessage : game.texts.properties.usableWith.USING;
+                        return self.hasOwnProperty('usingText') ? self.usingText : game.texts.properties.usableWith.USING;
                     },
                     get available () {
                         return game.objectInInventory(obj.id);
@@ -428,29 +428,29 @@ const Steller = {
                             return game.texts.properties.talkable.TALK.toLowerCase();
                         }
                     },
-                    get message () {
+                    get text () {
                         const self = this;
                         let actions = [];
                         for (let topic in self.topics) {
                             if (self.topics[topic].hasOwnProperty('available') && !self.topics[topic].available) continue;
                             actions.push({
                                 name: topic,
-                                message () {
+                                text () {
                                     let command = self.topics[topic].hasOwnProperty('command') ? self.topics[topic].command : Steller.utils.translate(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
 
                                     game.printCommand(command);
-                                    game.print(self.topics[topic].message);
+                                    game.print(self.topics[topic].text);
                                 }
                             })
                         }
 
                         actions.push({
                             name: self.hasOwnProperty('doneName') ? self.doneName : game.texts.properties.talkable.DONE,
-                            message () {
+                            text () {
                                 let command = self.hasOwnProperty('doneCommand') ? self.doneCommand : game.texts.properties.talkable.END;
 
                                 game.printCommand(command);
-                                if (self.hasOwnProperty('doneMessage')) game.print(self.doneMessage);
+                                if (self.hasOwnProperty('doneText')) game.print(self.doneText);
                                 game.unlockInteraction();
                                 game.state.action = {};
                             }
@@ -462,7 +462,7 @@ const Steller = {
                             actions: actions
                         }
 
-                        return self.hasOwnProperty('talkingMessage') ? self.talkingMessage : game.texts.properties.talkable.TALKING;
+                        return self.hasOwnProperty('talkingText') ? self.talkingText : game.texts.properties.talkable.TALKING;
                     }
                 }
             }

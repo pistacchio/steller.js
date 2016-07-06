@@ -3,7 +3,7 @@ const assert = require('chai').assert;
 
 function makeGame (onlyObject=false) {
     let gameObject = {
-        initialMessage: 'Here the adventure begins',
+        initialText: 'Here the adventure begins',
         title: 'My adventure',
         score: 0,
         locations: {
@@ -36,18 +36,18 @@ function makeGame (onlyObject=false) {
                 location: 'location1',
                 actions: {
                     'Examine': {
-                        beforeMessage () {
-                            game.print('before message');
+                        beforeText () {
+                            game.print('before text');
                         },
-                        afterMessage () {
-                            game.print('after message');
+                        afterText () {
+                            game.print('after text');
                         },
                         command: 'examining',
-                        message: 'examined'
+                        text: 'examined'
                     },
                     'Read': {
                         command: 'reading',
-                        message: 'read'
+                        text: 'read'
                     }
                 },
                 vars: {
@@ -56,20 +56,20 @@ function makeGame (onlyObject=false) {
                 properties: {
                     movable: {
                         objectName: 'the object',
-                        beforeMessage () {
+                        beforeText () {
                             game.print('before move');
                         },
-                        afterMessage () {
+                        afterText () {
                             game.print('after move');
                         }
                     },
                     usableWith: {
-                        usingMessage: 'using object 1, yeah!'
+                        usingText: 'using object 1, yeah!'
                     },
                     talkable: {
                         topics: {
                             'Weather': {
-                                message: 'Wow, il rains!'
+                                text: 'Wow, il rains!'
                             }
                         }
                     }
@@ -89,7 +89,7 @@ function makeGame (onlyObject=false) {
                         interactions: {
                             object3: {
                                 command: 'use with object 3',
-                                message: 'used with object 3'
+                                text: 'used with object 3'
                             },
                             default: 'Default action'
                         }
@@ -105,7 +105,7 @@ function makeGame (onlyObject=false) {
                         objectName: 'object 3',
                         interactions: {
                             object1: {
-                                message: 'used with object 1'
+                                text: 'used with object 1'
                             },
                             object2: {
                                 command: 'use with object 2'
@@ -141,13 +141,14 @@ describe('Steller game', function() {
         const game = makeGame();
         game.run();
 
+
         assert.deepEqual(game.state.header, { title: 'My adventure', score: 0 });
         assert.equal(game.state.main.name, 'Initial location');
         assert.equal(game.state.main.description, 'Wow, such a beautiful location');
         assert.equal(game.state.main.exits.length, 2);
         assert.equal(game.state.main.exits[0].name, 'North');
-        assert.deepEqual(game.state.out, {messages: [{
-            message: 'Here the adventure begins',
+        assert.deepEqual(game.state.out, {texts: [{
+            text: 'Here the adventure begins',
             type: 'normal'
         }]});
         assert.equal(game.state.main.actions.length, 2);
@@ -176,24 +177,24 @@ describe('Steller game', function() {
 
         assert.equal(game._currentLocation, 'location1');
 
-        game.state.main.exits[1].message();
+        game.state.main.exits[1].text();
         assert.equal(game._currentLocation, 'location1');
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'South', type: 'command' },
-                { message: 'A message, not a location', type: 'normal' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'South', type: 'command' },
+                { text: 'A message, not a location', type: 'normal' }
             ]}
         );
 
-        game.state.main.exits[0].message();
+        game.state.main.exits[0].text();
         assert.equal(game._currentLocation, 'location2');
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'South', type: 'command' },
-                { message: 'A message, not a location', type: 'normal' },
-                { message: 'North', type: 'command' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'South', type: 'command' },
+                { text: 'A message, not a location', type: 'normal' },
+                { text: 'North', type: 'command' }
             ]}
         );
         assert.equal(game.state.main.name, 'Second location');
@@ -204,29 +205,29 @@ describe('Steller game', function() {
         game.run();
 
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' }
             ]}
         );
 
-        game.state.main.actions[0].message();
+        game.state.main.actions[0].text();
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'Wait', type: 'command' },
-                { message: 'I am wating', type: 'normal' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'Wait', type: 'command' },
+                { text: 'I am wating', type: 'normal' }
             ]}
         );
 
         assert.equal(game._currentLocation, 'location1');
-        game.state.main.actions[1].message();
+        game.state.main.actions[1].text();
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'Wait', type: 'command' },
-                { message: 'I am wating', type: 'normal' },
-                { message: 'Teleport', type: 'command' },
-                { message: 'Teleported', type: 'normal' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'Wait', type: 'command' },
+                { text: 'I am wating', type: 'normal' },
+                { text: 'Teleport', type: 'command' },
+                { text: 'Teleported', type: 'normal' }
             ]
         });
         assert.equal(game._currentLocation, 'location2');
@@ -241,18 +242,18 @@ describe('Steller game', function() {
         assert.equal(game.state.main.objects[0].actions.length, 4);
         assert.equal(game.state.main.objects[0].actions[0].name, 'Examine');
 
-        game.state.main.objects[0].actions[0].message();
+        game.state.main.objects[0].actions[0].text();
         assert.deepEqual(game.state.out, {
-            messages:[
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'before message', type: 'normal' },
-                { message: 'examining', type: 'command' },
-                { message: 'examined', type: 'normal' },
-                { message: 'after message', type: 'normal' },
+            texts:[
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'before text', type: 'normal' },
+                { text: 'examining', type: 'command' },
+                { text: 'examined', type: 'normal' },
+                { text: 'after text', type: 'normal' },
             ]
         });
 
-        game.state.main.objects[0].actions[1].message();
+        game.state.main.objects[0].actions[1].text();
     });
 
     it('should handle score', () => {
@@ -262,9 +263,9 @@ describe('Steller game', function() {
         assert.equal(game.score, 0);
         game.setScore(42)
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 42, type: 'score' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 42, type: 'score' }
             ]
         })
         assert.equal(game.score, 42);
@@ -276,34 +277,34 @@ describe('Steller game', function() {
 
         assert.deepEqual(game.state.inventory, {objects: []});
         assert.equal(game.state.main.objects[0].actions[2].name, 'Take');
-        game.state.main.objects[0].actions[2].message();
-        game.state.main.objects[0].actions[0].message();
-        game.state.main.objects[0].actions[0].message();
+        game.state.main.objects[0].actions[2].text();
+        game.state.main.objects[0].actions[0].text();
+        game.state.main.objects[0].actions[0].text();
         assert.equal(game.state.inventory.objects.length, 3);
         assert.equal(game.state.inventory.objects[0].name, 'Object 1');
         assert.equal(game.state.inventory.objects[0].actions[2].name, 'Drop');
-        game.state.inventory.objects[0].actions[2].message();
-        game.state.inventory.objects[0].actions[0].message();
-        game.state.inventory.objects[0].actions[0].message();
+        game.state.inventory.objects[0].actions[2].text();
+        game.state.inventory.objects[0].actions[0].text();
+        game.state.inventory.objects[0].actions[0].text();
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'before move', type: 'normal' },
-                { message: 'take the object', type: 'command' },
-                { message: 'Taken', type: 'normal' },
-                { message: 'after move', type: 'normal' },
-                { message: 'take it!', type: 'command' },
-                { message: 'Taken', type: 'normal' },
-                { message: 'take', type: 'command' },
-                { message: 'Taken', type: 'normal' },
-                { message: 'before move', type: 'normal' },
-                { message: 'drop the object', type: 'command' },
-                { message: 'Dropped', type: 'normal' },
-                { message: 'after move', type: 'normal' },
-                { message: 'drop it!', type: 'command' },
-                { message: 'Dropped', type: 'normal' },
-                { message: 'drop', type: 'command' },
-                { message: 'Dropped', type: 'normal' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'before move', type: 'normal' },
+                { text: 'take the object', type: 'command' },
+                { text: 'Taken', type: 'normal' },
+                { text: 'after move', type: 'normal' },
+                { text: 'take it!', type: 'command' },
+                { text: 'Taken', type: 'normal' },
+                { text: 'take', type: 'command' },
+                { text: 'Taken', type: 'normal' },
+                { text: 'before move', type: 'normal' },
+                { text: 'drop the object', type: 'command' },
+                { text: 'Dropped', type: 'normal' },
+                { text: 'after move', type: 'normal' },
+                { text: 'drop it!', type: 'command' },
+                { text: 'Dropped', type: 'normal' },
+                { text: 'drop', type: 'command' },
+                { text: 'Dropped', type: 'normal' }
             ]
         });
     });
@@ -315,7 +316,7 @@ describe('Steller game', function() {
         assert.equal(game.state.main.objects[0].actions.length, 4);
 
         // take object 1
-        game.state.main.objects[0].actions[2].message()
+        game.state.main.objects[0].actions[2].text()
 
         assert.equal(game.state.inventory.objects[0].actions.length, 5);
         assert.equal(game.state.inventory.objects[0].actions[3].name, 'Use with');
@@ -328,7 +329,7 @@ describe('Steller game', function() {
         assert.equal(game.state.inventory.objects[0].actions.length, 5);
 
         // use "use with" of object 1 from inventory
-        game.state.inventory.objects[0].actions[3].message();
+        game.state.inventory.objects[0].actions[3].text();
 
         assert.equal(game.state.action.title, 'Use with');
         assert.equal(game.state.action.actions.length, 2);
@@ -341,62 +342,62 @@ describe('Steller game', function() {
         assert.equal(game.state.inventory.objects[0].actions.length, 0);
 
         // use object 1 with object 2
-        game.state.action.actions[0].message();
+        game.state.action.actions[0].text();
         assert.isFalse(game.state.locked);
 
         // take object 2
-        game.state.main.objects[0].actions[0].message()
+        game.state.main.objects[0].actions[0].text()
         // use object 2
-        game.state.inventory.objects[1].actions[1].message();
+        game.state.inventory.objects[1].actions[1].text();
 
         assert.equal(game.state.action.title, 'Object 2 Use With');
 
         // use object 2 with object 1
-        game.state.action.actions[0].message();
+        game.state.action.actions[0].text();
         // use object 2 with object 3
-        game.state.inventory.objects[1].actions[1].message();
-        game.state.action.actions[1].message();
+        game.state.inventory.objects[1].actions[1].text();
+        game.state.action.actions[1].text();
 
         // take object 3
-        game.state.main.objects[0].actions[0].message()
+        game.state.main.objects[0].actions[0].text()
         // use object 3 with object 1
-        game.state.inventory.objects[2].actions[1].message();
-        game.state.action.actions[0].message();
+        game.state.inventory.objects[2].actions[1].text();
+        game.state.action.actions[0].text();
         // use object 3 with object 2
-        game.state.inventory.objects[2].actions[1].message();
-        game.state.action.actions[1].message();
+        game.state.inventory.objects[2].actions[1].text();
+        game.state.action.actions[1].text();
 
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'before move', type: 'normal' },
-                { message: 'take the object', type: 'command' },
-                { message: 'Taken', type: 'normal' },
-                { message: 'after move', type: 'normal' },
-                { message: 'use', type: 'command' },
-                { message: 'using object 1, yeah!', type: 'normal' },
-                { message: 'use Object 1 with Object 2', type: 'command' },
-                { message: 'Nothing happens', type: 'normal' },
-                { message: 'take it!', type: 'command' },
-                { message: 'Taken', type: 'normal' },
-                { message: 'you try to use Object 2', type: 'command' },
-                { message: 'using', type: 'normal' },
-                { message: 'use with object 3', type: 'command' },
-                { message: 'used with object 3', type: 'normal' },
-                { message: 'you try to use Object 2', type: 'command' },
-                { message: 'using', type: 'normal' },
-                { message: 'use Object 2 with Object 1', type: 'command' },
-                { message: 'Default action', type: 'normal' },
-                { message: 'take', type: 'command' },
-                { message: 'Taken', type: 'normal' },
-                { message: 'Use with', type: 'command' },
-                { message: 'using', type: 'normal' },
-                { message: 'use Object 3 with Object 1', type: 'command' },
-                { message: 'used with object 1', type: 'normal' },
-                { message: 'Use with', type: 'command' },
-                { message: 'using', type: 'normal' },
-                { message: 'use with object 2', type: 'command' },
-                { message: 'Nothing happens', type: 'normal' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'before move', type: 'normal' },
+                { text: 'take the object', type: 'command' },
+                { text: 'Taken', type: 'normal' },
+                { text: 'after move', type: 'normal' },
+                { text: 'use', type: 'command' },
+                { text: 'using object 1, yeah!', type: 'normal' },
+                { text: 'use Object 1 with Object 2', type: 'command' },
+                { text: 'Nothing happens', type: 'normal' },
+                { text: 'take it!', type: 'command' },
+                { text: 'Taken', type: 'normal' },
+                { text: 'you try to use Object 2', type: 'command' },
+                { text: 'using', type: 'normal' },
+                { text: 'use with object 3', type: 'command' },
+                { text: 'used with object 3', type: 'normal' },
+                { text: 'you try to use Object 2', type: 'command' },
+                { text: 'using', type: 'normal' },
+                { text: 'use Object 2 with Object 1', type: 'command' },
+                { text: 'Default action', type: 'normal' },
+                { text: 'take', type: 'command' },
+                { text: 'Taken', type: 'normal' },
+                { text: 'Use with', type: 'command' },
+                { text: 'using', type: 'normal' },
+                { text: 'use Object 3 with Object 1', type: 'command' },
+                { text: 'used with object 1', type: 'normal' },
+                { text: 'Use with', type: 'command' },
+                { text: 'using', type: 'normal' },
+                { text: 'use with object 2', type: 'command' },
+                { text: 'Nothing happens', type: 'normal' }
             ]
         });
     });
@@ -406,12 +407,12 @@ describe('Steller game', function() {
         game.run();
 
         assert.deepEqual(game.state.action, {});
-        game.state.main.objects[0].actions[3].message();
+        game.state.main.objects[0].actions[3].text();
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'talk', type: 'command' },
-                { message: 'talking', type: 'normal' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'talk', type: 'command' },
+                { text: 'talking', type: 'normal' }
             ]
         });
         assert.isTrue(game.state.locked);
@@ -423,77 +424,77 @@ describe('Steller game', function() {
         assert.equal(game.state.action.actions[0].name, 'Weather');
         assert.equal(game.state.action.actions[1].name, 'Done');
 
-        game.state.action.actions[0].message();
+        game.state.action.actions[0].text();
 
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'talk', type: 'command' },
-                { message: 'talking', type: 'normal' },
-                { message: 'talk about Weather', type: 'command' },
-                { message: 'Wow, il rains!', type: 'normal' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'talk', type: 'command' },
+                { text: 'talking', type: 'normal' },
+                { text: 'talk about Weather', type: 'command' },
+                { text: 'Wow, il rains!', type: 'normal' }
             ]
         });
         assert.isTrue(game.state.locked);
 
-        game.state.action.actions[1].message();
+        game.state.action.actions[1].text();
 
         assert.isFalse(game.state.locked);
         assert.notEqual(game.state.main.actions.length, 0);
         assert.notEqual(game.state.main.exits.length, 0);
         assert.notEqual(game.state.main.objects[0].actions.length, 0);
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'Here the adventure begins', type: 'normal' },
-                { message: 'talk', type: 'command' },
-                { message: 'talking', type: 'normal' },
-                { message: 'talk about Weather', type: 'command' },
-                { message: 'Wow, il rains!', type: 'normal' },
-                { message: 'end conversation', type: 'command' }
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'talk', type: 'command' },
+                { text: 'talking', type: 'normal' },
+                { text: 'talk about Weather', type: 'command' },
+                { text: 'Wow, il rains!', type: 'normal' },
+                { text: 'end conversation', type: 'command' }
             ]
         });
 
-        game.state.out.messages = [];
+        game.state.out.texts = [];
         game.objects.object1.properties.talkable.objectName = 'the talking object';
-        game.state.main.objects[0].actions[3].message();
+        game.state.main.objects[0].actions[3].text();
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'talk to the talking object', type: 'command' },
-                { message: 'talking', type: 'normal' }
+            texts: [
+                { text: 'talk to the talking object', type: 'command' },
+                { text: 'talking', type: 'normal' }
             ]
         });
-        game.state.action.actions[1].message();
+        game.state.action.actions[1].text();
 
-        game.state.out.messages = [];
+        game.state.out.texts = [];
         game.objects.object1.properties.talkable.topics.Weather.available = false;
-        game.state.main.objects[0].actions[3].message();
+        game.state.main.objects[0].actions[3].text();
         assert.equal(game.state.action.actions.length, 1);
         assert.equal(game.state.action.actions[0].name, 'Done');
-        game.state.action.actions[0].message();
+        game.state.action.actions[0].text();
 
-        game.state.out.messages = [];
+        game.state.out.texts = [];
         game.objects.object1.properties.talkable.topics.Weather.available = true;
         game.objects.object1.properties.talkable.topics.Weather.command = 'you ask about the weather';
         game.objects.object1.properties.talkable.doneName = 'Done button';
         game.objects.object1.properties.talkable.doneCommand = 'suddenly ed the conversation';
-        game.objects.object1.properties.talkable.doneMessage = 'You are tired of talking. Bye!';
+        game.objects.object1.properties.talkable.doneText = 'You are tired of talking. Bye!';
         game.objects.object1.properties.talkable.title = 'Strange, but talking with an object';
-        game.objects.object1.properties.talkable.talkingMessage = '... talking softly ...';
-        game.state.main.objects[0].actions[3].message();
+        game.objects.object1.properties.talkable.talkingText = '... talking softly ...';
+        game.state.main.objects[0].actions[3].text();
 
         assert.equal(game.state.action.actions[1].name, 'Done button');
         assert.equal(game.state.action.title, 'Strange, but talking with an object');
 
-        game.state.action.actions[0].message();
-        game.state.action.actions[1].message();
+        game.state.action.actions[0].text();
+        game.state.action.actions[1].text();
         assert.deepEqual(game.state.out, {
-            messages: [
-                { message: 'talk to the talking object', type: 'command' },
-                { message: '... talking softly ...', type: 'normal' },
-                { message: 'you ask about the weather', type: 'command' },
-                { message: 'Wow, il rains!', type: 'normal' },
-                { message: 'suddenly ed the conversation', type: 'command' },
-                { message: 'You are tired of talking. Bye!', type: 'normal' }
+            texts: [
+                { text: 'talk to the talking object', type: 'command' },
+                { text: '... talking softly ...', type: 'normal' },
+                { text: 'you ask about the weather', type: 'command' },
+                { text: 'Wow, il rains!', type: 'normal' },
+                { text: 'suddenly ed the conversation', type: 'command' },
+                { text: 'You are tired of talking. Bye!', type: 'normal' }
             ]
         });
     });
@@ -521,15 +522,15 @@ describe('Steller game', function() {
             score: 42,
             state: {
                 out: {
-                    messages: [
-                        { message: 'Here the adventure begins', type: 'normal' },
-                        { message: 'before move', type: 'normal' },
-                        { message: 'take the object', type: 'command' },
-                        { message: 'Taken', type: 'normal' },
-                        { message: 'after move', type: 'normal' },
-                        { message: 'North', type: 'command' },
-                        { message: 42, type: 'score' },
-                        { message: 'save', type: 'command' }
+                    texts: [
+                        { text: 'Here the adventure begins', type: 'normal' },
+                        { text: 'before move', type: 'normal' },
+                        { text: 'take the object', type: 'command' },
+                        { text: 'Taken', type: 'normal' },
+                        { text: 'after move', type: 'normal' },
+                        { text: 'North', type: 'command' },
+                        { text: 42, type: 'score' },
+                        { text: 'save', type: 'command' }
                     ]
                 }
             }
@@ -538,8 +539,8 @@ describe('Steller game', function() {
         let game = makeGame();
         game.run();
 
-        game.state.main.objects[0].actions[2].message();
-        game.state.main.exits[0].message();
+        game.state.main.objects[0].actions[2].text();
+        game.state.main.exits[0].text();
         game.setScore(42);
         const savedGame = game.save();
         const savedGameString = game.save(true);
@@ -554,7 +555,7 @@ describe('Steller game', function() {
         assert.equal(game._currentLocation, 'location2');
         assert.equal(game.state.inventory.objects.length, 1);
 
-        assert.equal(game.save(true), '{"locationVars":{"location1":{"var1":1},"location2":{}},"objectVars":{"object1":{"var2":2},"object2":{},"object3":{}},"objectLocations":{"object1":"__inventory__","object2":"location1","object3":"location1"},"vars":{"var3":3},"currentLocation":"location2","score":42,"state":{"out":{"messages":[{"message":"Here the adventure begins","type":"normal"},{"message":"before move","type":"normal"},{"message":"take the object","type":"command"},{"message":"Taken","type":"normal"},{"message":"after move","type":"normal"},{"message":"North","type":"command"},{"message":42,"type":"score"},{"message":"save","type":"command"},{"message":"Restored","type":"normal"},{"message":"save","type":"command"}]}}}');
+        assert.equal(game.save(true), '{"locationVars":{"location1":{"var1":1},"location2":{}},"objectVars":{"object1":{"var2":2},"object2":{},"object3":{}},"objectLocations":{"object1":"__inventory__","object2":"location1","object3":"location1"},"vars":{"var3":3},"currentLocation":"location2","score":42,"state":{"out":{"texts":[{"text":"Here the adventure begins","type":"normal"},{"text":"before move","type":"normal"},{"text":"take the object","type":"command"},{"text":"Taken","type":"normal"},{"text":"after move","type":"normal"},{"text":"North","type":"command"},{"text":42,"type":"score"},{"text":"save","type":"command"},{"text":"Restored","type":"normal"},{"text":"save","type":"command"}]}}}');
 
         game = makeGame();
         game.run();

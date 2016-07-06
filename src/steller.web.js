@@ -129,7 +129,7 @@ Steller.Web = {
             let _footer =    {};
             let _main =      {};
             let _out =       {
-                messages: []
+                texts: []
             };
             let _action =    {};
             let _inventory = {};
@@ -161,7 +161,7 @@ Steller.Web = {
                         );
 
                         for (let exit of val.exits) {
-                            const $anchor = $(`<li><a href="#">${exit.name}</a></li>`).on('click', exit.message);
+                            const $anchor = $(`<li><a href="#">${exit.name}</a></li>`).on('click', exit.text);
                             $main.find('.exits').append($anchor);
                         }
                     }
@@ -182,7 +182,7 @@ Steller.Web = {
                         `);
 
                         for (let action of val.actions) {
-                            const $anchor = $(`<li><a href="#">${action.name}</a></li>`).on('click', action.message);
+                            const $anchor = $(`<li><a href="#">${action.name}</a></li>`).on('click', action.text);
                             $main.find('.actions').append($anchor);
                         }
                     }
@@ -195,16 +195,16 @@ Steller.Web = {
                     _out = val;
 
                     $output.html('');
-                    for (let message of val.messages) {
-                        switch(message.type) {
+                    for (let text of val.texts) {
+                        switch(text.type) {
                             case 'command':
-                                $output.append(`<div class="command">> ${message.message}</div>`)
+                                $output.append(`<div class="command">> ${text.text}</div>`)
                                 break;
                             case 'score':
-                                $output.append(`<div class="score">${Steller.utils.translate(self.texts.ui.SCORE_UP, message.message)}</div>`)
+                                $output.append(`<div class="score">${Steller.utils.translate(self.texts.ui.SCORE_UP, text.text)}</div>`)
                                 break;
                             default:
-                                $output.append(`<div>${message.message}</div>`)
+                                $output.append(`<div>${text.text}</div>`)
                                 break;
                         }
                     }
@@ -269,7 +269,7 @@ Steller.Web = {
                         `);
 
                         for (let action of val.actions) {
-                            const $anchor = $(`<li><a href="#">${action.name}</a></li>`).on('click', action.message);
+                            const $anchor = $(`<li><a href="#">${action.name}</a></li>`).on('click', action.text);
                             $action.find('.actions').append($anchor);
                         }
                     }
@@ -283,7 +283,7 @@ Steller.Web = {
                 const $object = $(`<li>${object.name}</li>`);
 
                 for (let action of object.actions) {
-                    const $anchor = $(`<a class="action" href="#">${action.name}</a>`).on('click', action.message);
+                    const $anchor = $(`<a class="action" href="#">${action.name}</a>`).on('click', action.text);
                     $object.append($anchor);
                 }
 

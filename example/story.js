@@ -11,7 +11,7 @@ function darkWarning () {
 const game = new Steller.Web.Game({
     title: 'Cloak of Darkness',
     score: 0,
-    initialMessage: `Hurrying through the rainswept November night, you're glad to see
+    initialText: `Hurrying through the rainswept November night, you're glad to see
         the bright lights of the Opera House. It's surprising that there aren't
         more people about but, hey, what do you expect in a cheap demo game...?
         <div style="text-align: center">Cloak of Darkness</div>
@@ -76,7 +76,7 @@ const game = new Steller.Web.Game({
             actions: {
                 'Examine': {
                     command: 'examine the hook',
-                    get message () {
+                    get text () {
                         if (game.objects.cloak.vars.onHook) game.moveObjectToLocation('cloak');
                         return `A small brass hook ${game.objects.cloak.vars.onHook ? 'with a cloak hangin on it' : 'screwed to the wall'}`;
                     }
@@ -89,7 +89,7 @@ const game = new Steller.Web.Game({
             actions: {
                 'Examine': {
                     command: 'examine the cloak',
-                    message: `A handsome cloak, of velvet trimmed with satin, and slightly
+                    text: `A handsome cloak, of velvet trimmed with satin, and slightly
                         spattered with raindrops. Its blackness is so deep that it almost
                         seems to suck light from the room.`
                 }
@@ -97,7 +97,7 @@ const game = new Steller.Web.Game({
             properties: {
                 movable: {
                     objectName: 'the cloak',
-                    beforeMessage () {
+                    beforeText () {
                         game.objects.cloak.vars.onHook = false;
                     }
                 },
@@ -106,7 +106,7 @@ const game = new Steller.Web.Game({
                     interactions: {
                         hook: {
                             command: 'use the cloak with the hook',
-                            get message () {
+                            get text () {
                                 game.objects.cloak.vars.onHook = true;
                                 game.moveObjectToLocation('cloak');
                                 return 'The cloak is now on the hook again';
@@ -127,7 +127,7 @@ const game = new Steller.Web.Game({
             actions: {
                 Read: {
                     command: 'read the message',
-                    get message () {
+                    get text () {
                         game.end();
                         if (game.objects.message.vars.damages < 2) {
                             game.setScore(game.score + 1);
@@ -151,11 +151,11 @@ const game = new Steller.Web.Game({
                     objectName: 'the talking statue',
                     topics: {
                         'Weather': {
-                            message: 'Wow, il rains!'
+                            text: 'Wow, il rains!'
                         }
                     },
                     command: 'Talking with the statue',
-                    doneMessage: 'You say goodbye',
+                    doneText: 'You say goodbye',
                     doneName: 'Ok, enough'
                 }
             }
