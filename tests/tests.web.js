@@ -1,4 +1,4 @@
-const assert = chai.assert;
+$('body').append('<div id="container"></div>');
 
 function makeGame () {
     var game =  new Steller.Web.Game({
