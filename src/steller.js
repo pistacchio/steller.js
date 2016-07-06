@@ -6,7 +6,7 @@ const Steller = {
     Game: class {
         constructor (options) {
             this.lang              = _.get(options, 'lang', 'en');
-            this.initialText    = _.get(options, 'initialText', '');
+            this.initialText       = _.get(options, 'initialText', '');
             this.locations         = _.get(options, 'locations', {});
             this.objects           = _.get(options, 'objects', {});
             this._currentLocation  = _.get(options, 'currentLocation', null);
@@ -200,6 +200,10 @@ const Steller = {
             } else {
                 this.print(location);
             }
+        }
+
+        currentLocationIs (location) {
+            return this._currentLocation === location;
         }
 
         objectInInventory (objectName) {

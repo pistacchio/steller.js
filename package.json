@@ -6,20 +6,22 @@
   "scripts": {
     "testcore": "mocha tests/tests.js",
     "coveragecore": "istanbul cover --report html node_modules/.bin/_mocha tests/tests.js; open coverage/index.html",
-    "buildweb": "mkdir dist; cp node_modules/lodash/lodash.min.js dist/lodash.js; cp node_modules//jquery/dist/jquery.min.js dist/jquery.js; babel src/steller.js --presets es2015-script --out-file dist/steller.babel.js; babel src/steller.web.js --presets es2015-script --out-file dist/steller.web.babel.js; cat node_modules/babel-polyfill/dist/polyfill.min.js dist/steller.babel.js dist/steller.web.babel.js > dist/steller.web.js; rm dist/steller.babel.js; rm dist/steller.web.babel.js",
-    "testwebprepare": "babel src/steller.js --presets es2015-script --out-file tests/steller.es5.js; babel src/steller.web.js --presets es2015-script --out-file tests/steller.web.es5.js; babel tests/tests.web.js --presets es2015-script --out-file tests/tests.web.es5.js;",
-    "testweb": "npm run testwebprepare; mocha-phantomjs tests/index.html",
-    "coverageweb": "npm run testwebprepare; node tests/coveragewebignore.js; istanbul instrument tests/steller.web.es5.js > tests/steller.web.es5.ins.js; mocha-phantomjs tests/index.coverage.html --hooks tests/phantom_hooks.js; istanbul report html; open coverage/index.html"
+    "buildweb": "mkdir dist; cp node_modules/lodash/lodash.min.js dist/lodash.js; cp node_modules/jquery/dist/jquery.min.js dist/jquery.js; babel src/steller.js --presets es2015-script --out-file dist/steller.babel.js; babel src/steller.web.js --presets es2015-script --out-file dist/steller.web.babel.js; cat node_modules/babel-polyfill/dist/polyfill.min.js dist/steller.babel.js dist/steller.web.babel.js > dist/steller.web.js; rm dist/steller.babel.js; rm dist/steller.web.babel.js",
+    "testweb": "karma start tests/karma.conf.js;",
+    "coverageweb": "open coverage/src/steller.web.js.html"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "babel": "^6.5.2",
+    "babel-cli": "^6.10.1",
     "babel-polyfill": "^6.9.1",
     "babel-preset-es2015-script": "*",
     "chai": "^3.5.0",
-    "istanbul": "^0.4.4",
     "jquery": "^3.0.0",
+    "karma": "^1.1.0",
+    "karma-chai": "^0.1.0",
+    "karma-coverage": "^1.0.0",
+    "karma-mocha": "^1.1.1",
     "lodash": "^4.13.1",
     "mocha": "^2.5.3",
     "npm": "^3.10.3"

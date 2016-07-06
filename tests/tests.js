@@ -175,7 +175,7 @@ describe('Steller game', function() {
         const game = makeGame();
         game.run();
 
-        assert.equal(game._currentLocation, 'location1');
+        assert.isTrue(game.currentLocationIs('location1'));
 
         game.state.main.exits[1].text();
         assert.equal(game._currentLocation, 'location1');
