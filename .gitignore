@@ -1,4 +1,5 @@
 node_modules/
 dist/
 coverage/
-tests/
+tests/*.es5.js
+tests/*.web.es5.ins.js
