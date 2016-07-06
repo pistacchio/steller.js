@@ -1,4 +1,5 @@
-const _ = require('lodash');
+/* istanbul ignore next */
+_ = this.window === undefined ? require('lodash') : _;
 
 const Steller = {
     INVENTORY: '__inventory__',
@@ -554,4 +555,7 @@ const Steller = {
     }
 };
 
-module.exports = Steller;
+/* istanbul ignore next */
+if (this.window === undefined) {
+    module.exports = Steller;
+}
