@@ -67,6 +67,11 @@ const Steller = {
                     }
                 }
 
+                for (let object in location.objects) {
+                    location.objects[object].location = name;
+                    this.objects[object] = location.objects[object];
+                }
+
                 return location;
             });
 
@@ -282,6 +287,11 @@ const Steller = {
         objectsInLocation (locationName) {
             if (locationName === undefined) locationName = this._currentLocation;
             return _.pickBy(this.objects, o => o.location === locationName);
+        }
+
+        objectIsInLocation (objectName, locationName) {
+            if (locationName === undefined) locationName = this._currentLocation;
+            return this.objects[objectName].location === locationName;
         }
 
         moveObjectToLocation (objectName, locationName) {

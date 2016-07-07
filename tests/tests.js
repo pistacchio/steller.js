@@ -186,6 +186,22 @@ describe('Steller game', function() {
         assert.equal(_.keys(game.objects).length, 4);
     });
 
+    it('should allow object declaration withing locations', () => {
+        const gameObject = makeGame(true);
+        gameObject.locations.location1.objects = {
+            object5: {
+                name: 'Object 5'
+            }
+        };
+        const game = new Steller.Game(gameObject);
+        game.run();
+
+        assert.equal(game.state.main.objects.length, 4);
+        assert.equal(game.state.main.objects[3].name, 'Object 5');
+        assert.isTrue(game.objectIsInLocation('object5'));
+        assert.isTrue(game.objectIsInLocation('object5', 'location1'));
+    });
+
 
     it('should move in the inventory all objects in options.inventory', () => {
         const gameObject = makeGame(true);
