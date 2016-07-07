@@ -82,7 +82,7 @@ const Steller = {
             };
 
             this.print(this.initialText);
-            this.refreshOutput();
+            this.refreshState();
         }
 
         describeCurrentLocation () {
@@ -92,11 +92,23 @@ const Steller = {
             actions = Steller.utils.lightMerge(actions, globalActions);
             const outputActions = []
             for (let action in actions) {
+                let ac = {
+                    get command () { return action.toLowerCase() },
+                    get name() { return action },
+                    get text () { return actions[action] },
+                    available: true
+                };
+
+                if (_.isObject(actions[action])) {
+                    ac = Steller.utils.lightMerge(actions[action], ac);
+                }
+
+                if (!ac.available) continue;
                 outputActions.push({
-                    name: action,
+                    name: ac.name,
                     text: () => {
-                        this.printCommand(action);
-                        this.print(actions[action]);
+                        this.printCommand(ac.command);
+                        this.print(ac.text);
                     }
                 });
             }
@@ -106,10 +118,24 @@ const Steller = {
             const exits = this.state.locked ? [] : this.currentLocation.exits;
             const outputExits = [];
             for (let exit in exits) {
+                let ex = {
+                    get command () {return exit.toLowerCase(); },
+                    get text () { return exits[exit] },
+                    available: true
+                };
+
+                if (_.isObject(exits[exit])) {
+                    if (exits[exit].hasOwnProperty('direction')) {
+                        Object.defineProperty(exits[exit], 'text', Object.getOwnPropertyDescriptor(exits[exit], 'direction'));
+                    }
+                    ex = Steller.utils.lightMerge(exits[exit], ex);
+                }
+
+                if (!ex.available) continue;
                 outputExits.push({
                     name: exit,
                     text: () => {
-                        this.gotoLocation(exits[exit], exit);
+                        this.gotoLocation(ex.text, ex.command);
                     }
                 });
             }
@@ -156,6 +182,14 @@ const Steller = {
                 availableActions = _.pickBy(availableActions, a => a.available !== false);
 
                 actions = _.map(availableActions, (action, actionName) => {
+                    if (_.isString(action)) return {
+                        name: actionName,
+                        text: () => {
+                            self.printCommand(actionName.toLowerCase());
+                            self.print(action);
+                        }
+                    };
+
                     return {
                         name: actionName,
                         text: () => {
@@ -198,7 +232,7 @@ const Steller = {
 
             if (this.locations.hasOwnProperty(location)) {
                 this.currentLocation = location;
-                this.refreshOutput();
+                this.refreshState();
             } else {
                 this.print(location);
             }
@@ -232,14 +266,14 @@ const Steller = {
             const object = this.objects[objectName];
 
             object.location = locationName;
-            this.refreshOutput();
+            this.refreshState();
         }
 
         moveObjectToInventory (objectName) {
             this.moveObjectToLocation(objectName, Steller.INVENTORY);
         }
 
-        refreshOutput () {
+        refreshState () {
             this.describeCurrentLocation();
             this.updateInventory();
         }
@@ -255,12 +289,12 @@ const Steller = {
 
         lockInteraction () {
             this.state.locked = true;
-            this.refreshOutput();
+            this.refreshState();
         }
 
         unlockInteraction () {
             this.state.locked = false;
-            this.refreshOutput();
+            this.refreshState();
         }
 
         end () {
@@ -316,7 +350,7 @@ const Steller = {
             this.score = data.score;
             this.state.out.texts = data.state.out.texts;
             this.state.locked = false;
-            this.refreshOutput();
+            this.refreshState();
             this.print(this.texts.RESTORED);
         }
     },

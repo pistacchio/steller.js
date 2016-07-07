@@ -223,7 +223,7 @@ Steller.Web = {
                                 $output.append(`<div class="command">> ${text.text}</div>`)
                                 break;
                             case 'score':
-                                $output.append(`<div class="score">${Steller.utils.translate(self.texts.ui.SCORE_UP, text.text)}</div>`)
+                                $output.append(`<div class="score">${Steller.utils.formatText(self.texts.ui.SCORE_UP, text.text)}</div>`)
                                 break;
                             default:
                                 $output.append(`<div>${text.text}</div>`)

@@ -102,10 +102,11 @@ describe('Steller web game', () => {
 
         assert.equal($('#container .output').text(), 'Here the adventure begins');
         $('#container .main .actions a').click();
-        assert.equal($('#container .output').text(), 'Here the adventure begins> Waitwaiting');
+        assert.equal($('#container .output').text(), 'Here the adventure begins> waitwaiting');
 
         $('#container .main .exits a').click();
-        assert.equal($('#container .output').text(), 'Here the adventure begins> Waitwaiting> North');
+
+        assert.equal($('#container .output').text(), 'Here the adventure begins> waitwaiting> north');
         assert.equal($('#container .main .name').text(), 'My second location');
     });
 

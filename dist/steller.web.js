@@ -114,7 +114,7 @@ var Steller = {
                 };
 
                 this.print(this.initialText);
-                this.refreshOutput();
+                this.refreshState();
             }
         }, {
             key: 'describeCurrentLocation',
@@ -128,17 +128,37 @@ var Steller = {
                 var outputActions = [];
 
                 var _loop = function _loop(action) {
+                    var ac = {
+                        get command() {
+                            return action.toLowerCase();
+                        },
+                        get name() {
+                            return action;
+                        },
+                        get text() {
+                            return actions[action];
+                        },
+                        available: true
+                    };
+
+                    if (_.isObject(actions[action])) {
+                        ac = Steller.utils.lightMerge(actions[action], ac);
+                    }
+
+                    if (!ac.available) return 'continue';
                     outputActions.push({
-                        name: action,
+                        name: ac.name,
                         text: function text() {
-                            _this.printCommand(action);
-                            _this.print(actions[action]);
+                            _this.printCommand(ac.command);
+                            _this.print(ac.text);
                         }
                     });
                 };
 
                 for (var action in actions) {
-                    _loop(action);
+                    var _ret = _loop(action);
+
+                    if (_ret === 'continue') continue;
                 }
 
                 // exits
@@ -146,16 +166,36 @@ var Steller = {
                 var outputExits = [];
 
                 var _loop2 = function _loop2(exit) {
+                    var ex = {
+                        get command() {
+                            return exit.toLowerCase();
+                        },
+                        get text() {
+                            return exits[exit];
+                        },
+                        available: true
+                    };
+
+                    if (_.isObject(exits[exit])) {
+                        if (exits[exit].hasOwnProperty('direction')) {
+                            Object.defineProperty(exits[exit], 'text', Object.getOwnPropertyDescriptor(exits[exit], 'direction'));
+                        }
+                        ex = Steller.utils.lightMerge(exits[exit], ex);
+                    }
+
+                    if (!ex.available) return 'continue';
                     outputExits.push({
                         name: exit,
                         text: function text() {
-                            _this.gotoLocation(exits[exit], exit);
+                            _this.gotoLocation(ex.text, ex.command);
                         }
                     });
                 };
 
                 for (var exit in exits) {
-                    _loop2(exit);
+                    var _ret2 = _loop2(exit);
+
+                    if (_ret2 === 'continue') continue;
                 }
 
                 // objects
@@ -208,6 +248,14 @@ var Steller = {
                     });
 
                     actions = _.map(availableActions, function (action, actionName) {
+                        if (_.isString(action)) return {
+                            name: actionName,
+                            text: function text() {
+                                self.printCommand(actionName.toLowerCase());
+                                self.print(action);
+                            }
+                        };
+
                         return {
                             name: actionName,
                             text: function text() {
@@ -253,7 +301,7 @@ var Steller = {
 
                 if (this.locations.hasOwnProperty(location)) {
                     this.currentLocation = location;
-                    this.refreshOutput();
+                    this.refreshState();
                 } else {
                     this.print(location);
                 }
@@ -299,7 +347,7 @@ var Steller = {
                 var object = this.objects[objectName];
 
                 object.location = locationName;
-                this.refreshOutput();
+                this.refreshState();
             }
         }, {
             key: 'moveObjectToInventory',
@@ -307,8 +355,8 @@ var Steller = {
                 this.moveObjectToLocation(objectName, Steller.INVENTORY);
             }
         }, {
-            key: 'refreshOutput',
-            value: function refreshOutput() {
+            key: 'refreshState',
+            value: function refreshState() {
                 this.describeCurrentLocation();
                 this.updateInventory();
             }
@@ -326,13 +374,13 @@ var Steller = {
             key: 'lockInteraction',
             value: function lockInteraction() {
                 this.state.locked = true;
-                this.refreshOutput();
+                this.refreshState();
             }
         }, {
             key: 'unlockInteraction',
             value: function unlockInteraction() {
                 this.state.locked = false;
-                this.refreshOutput();
+                this.refreshState();
             }
         }, {
             key: 'end',
@@ -393,7 +441,7 @@ var Steller = {
                 this.score = data.score;
                 this.state.out.texts = data.state.out.texts;
                 this.state.locked = false;
-                this.refreshOutput();
+                this.refreshState();
                 this.print(this.texts.RESTORED);
             }
         }, {

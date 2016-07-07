@@ -14,12 +14,22 @@ function makeGame (onlyObject=false) {
                 exits: {
                     North: 'location2',
                     South: 'A message, not a location',
+                    East: {
+                        command: 'go east',
+                        text: 'Hmm, seems like you do not want to really go east'
+                    }
                 },
                 actions: {
                     'Wait': 'I am wating',
-                    get Teleport () {
-                        game.gotoLocation('location2');
-                        return 'Teleported';
+                    Teleport: {
+                        get text () {
+                            game.gotoLocation('location2');
+                            return 'Teleported'
+                        }
+                    },
+                    Look: {
+                        command: 'look around',
+                        text: 'Nothing interesting'
                     }
                 },
                 vars: {
@@ -61,6 +71,9 @@ function makeGame (onlyObject=false) {
             object3: {
                 name: 'Object 3',
                 location: 'location1',
+                actions: {
+                    StupidAction: 'Some stupid action'
+                },
                 properties: {
                     propertable: {}
                 }
@@ -111,13 +124,13 @@ describe('Steller game', function() {
         assert.deepEqual(game.state.header, { title: 'My adventure', score: 0 });
         assert.equal(game.state.main.name, 'Initial location');
         assert.equal(game.state.main.description, 'Wow, such a beautiful location');
-        assert.equal(game.state.main.exits.length, 2);
+        assert.equal(game.state.main.exits.length, 3);
         assert.equal(game.state.main.exits[0].name, 'North');
         assert.deepEqual(game.state.out, {texts: [{
             text: 'Here the adventure begins',
             type: 'normal'
         }]});
-        assert.equal(game.state.main.actions.length, 2);
+        assert.equal(game.state.main.actions.length, 3);
         assert.equal(game.state.main.actions[0].name, 'Wait');
 
     });
@@ -157,7 +170,7 @@ describe('Steller game', function() {
         assert.deepEqual(game.state.out, {
             texts: [
                 { text: 'Here the adventure begins', type: 'normal' },
-                { text: 'South', type: 'command' },
+                { text: 'south', type: 'command' },
                 { text: 'A message, not a location', type: 'normal' }
             ]}
         );
@@ -167,12 +180,77 @@ describe('Steller game', function() {
         assert.deepEqual(game.state.out, {
             texts: [
                 { text: 'Here the adventure begins', type: 'normal' },
-                { text: 'South', type: 'command' },
+                { text: 'south', type: 'command' },
                 { text: 'A message, not a location', type: 'normal' },
-                { text: 'North', type: 'command' }
+                { text: 'north', type: 'command' }
             ]}
         );
         assert.equal(game.state.main.name, 'Second location');
+    });
+
+    it('should have configurable exits', () => {
+        const game = makeGame();
+        game.run();
+
+        assert.equal(game.state.main.exits.length, 3);
+        game.state.main.exits[2].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'go east', type: 'command' },
+                { text: 'Hmm, seems like you do not want to really go east', type: 'normal' }
+            ]
+        });
+
+        game.locations.location1.exits.East.available = false;
+        game.refreshState();
+        assert.equal(game.state.main.exits.length, 2);
+
+        game.locations.location1.exits.East.available = true;
+        game.locations.location1.exits.East.direction = 'Same as text';
+        game.refreshState();
+        game.state.main.exits[2].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'go east', type: 'command' },
+                { text: 'Hmm, seems like you do not want to really go east', type: 'normal' },
+                { text: 'go east', type: 'command' },
+                { text: 'Same as text', type: 'normal' }
+            ]
+        });
+    });
+
+    it('should have configurable locations actions', () => {
+        const game = makeGame();
+        game.run();
+
+        game.state.main.actions[2].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'look around', type: 'command' },
+                { text: 'Nothing interesting', type: 'normal' }
+            ]
+        });
+
+        game.locations.location1.actions.Look.available = false;
+        game.refreshState();
+        assert.equal(game.state.main.actions.length, 2);
+    });
+
+    it('should have configurable object actions', () => {
+        const game = makeGame();
+        game.run();
+
+        game.state.main.objects[2].actions[0].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'stupidaction', type: 'command' },
+                { text: 'Some stupid action', type: 'normal' }
+            ]
+        });
     });
 
     it('should execute location actions', () => {
@@ -189,7 +267,7 @@ describe('Steller game', function() {
         assert.deepEqual(game.state.out, {
             texts: [
                 { text: 'Here the adventure begins', type: 'normal' },
-                { text: 'Wait', type: 'command' },
+                { text: 'wait', type: 'command' },
                 { text: 'I am wating', type: 'normal' }
             ]}
         );
@@ -199,9 +277,9 @@ describe('Steller game', function() {
         assert.deepEqual(game.state.out, {
             texts: [
                 { text: 'Here the adventure begins', type: 'normal' },
-                { text: 'Wait', type: 'command' },
+                { text: 'wait', type: 'command' },
                 { text: 'I am wating', type: 'normal' },
-                { text: 'Teleport', type: 'command' },
+                { text: 'teleport', type: 'command' },
                 { text: 'Teleported', type: 'normal' }
             ]
         });
@@ -276,7 +354,7 @@ describe('Steller game', function() {
                         { text: 'examining', type: 'command' },
                         { text: 'examined', type: 'normal' },
                         { text: 'after text', type: 'normal' },
-                        { text: 'North', type: 'command' },
+                        { text: 'north', type: 'command' },
                         { text: 42, type: 'score' },
                         { text: 'save', type: 'command' }
                     ]
@@ -302,7 +380,7 @@ describe('Steller game', function() {
         assert.equal(game.score, 42);
         assert.equal(game._currentLocation, 'location2');
 
-        assert.equal(game.save(true), '{"locationVars":{"location1":{"var1":1},"location2":{}},"objectVars":{"object1":{"var2":2},"object2":{},"object3":{},"character1":{}},"objectLocations":{"object1":"location1","object2":"location1","object3":"location1","character1":null},"vars":{"var3":3},"currentLocation":"location2","score":42,"state":{"out":{"texts":[{"text":"Here the adventure begins","type":"normal"},{"text":"before text","type":"normal"},{"text":"examining","type":"command"},{"text":"examined","type":"normal"},{"text":"after text","type":"normal"},{"text":"North","type":"command"},{"text":42,"type":"score"},{"text":"save","type":"command"},{"text":"Restored","type":"normal"},{"text":"save","type":"command"}]}}}');
+        assert.equal(game.save(true), '{"locationVars":{"location1":{"var1":1},"location2":{}},"objectVars":{"object1":{"var2":2},"object2":{},"object3":{},"character1":{}},"objectLocations":{"object1":"location1","object2":"location1","object3":"location1","character1":null},"vars":{"var3":3},"currentLocation":"location2","score":42,"state":{"out":{"texts":[{"text":"Here the adventure begins","type":"normal"},{"text":"before text","type":"normal"},{"text":"examining","type":"command"},{"text":"examined","type":"normal"},{"text":"after text","type":"normal"},{"text":"north","type":"command"},{"text":42,"type":"score"},{"text":"save","type":"command"},{"text":"Restored","type":"normal"},{"text":"save","type":"command"}]}}}');
 
         game = makeGame();
         game.run();
@@ -328,9 +406,9 @@ describe('Steller game', function() {
         game.run();
 
         assert.isFalse(game.state.locked);
-        assert.equal(game.state.main.exits.length, 2);
+        assert.equal(game.state.main.exits.length, 3);
         assert.equal(game.state.main.objects[0].actions.length, 2);
-        assert.equal(game.state.main.actions.length, 2);
+        assert.equal(game.state.main.actions.length, 3);
         assert.equal(game.state.inventory.objects[0].actions.length, 1);
 
         game.lockInteraction()
@@ -368,9 +446,9 @@ describe('Steller game', function() {
         let game = makeGame();
         game.run();
 
-        assert.equal(game.state.main.objects[2].actions.length, 1);
-        assert.equal(game.state.main.objects[2].actions[0].name, 'SomeProperty');
-        game.state.main.objects[2].actions[0].text();
+        assert.equal(game.state.main.objects[2].actions.length, 2);
+        assert.equal(game.state.main.objects[2].actions[1].name, 'SomeProperty');
+        game.state.main.objects[2].actions[1].text();
         assert.deepEqual(game.state.out, {
             texts: [
                 { text: 'Here the adventure begins', type: 'normal' },

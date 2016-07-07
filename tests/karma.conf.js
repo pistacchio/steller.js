@@ -16,6 +16,7 @@ module.exports = function(config) {
             '../node_modules/lodash/lodash.min.js',
             '../node_modules/jquery/dist/jquery.min.js',
             '../src/steller.js',
+            '../src/steller.lib.js',
             '../src/steller.web.js',
             '../tests/tests.web.js'
         ]
