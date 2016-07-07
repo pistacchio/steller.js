@@ -340,7 +340,9 @@ var Steller = {
                 if (command !== undefined) this.printCommand(command);
 
                 if (this.locations.hasOwnProperty(location)) {
+                    if (this.currentLocation.hasOwnProperty('onExit')) this.currentLocation.onExit();
                     this.currentLocation = location;
+                    if (this.currentLocation.hasOwnProperty('onEnter')) this.currentLocation.onEnter();
                     this.refreshState();
                 } else {
                     this.print(location);

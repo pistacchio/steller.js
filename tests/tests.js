@@ -294,6 +294,35 @@ describe('Steller game', function() {
         assert.equal(game.state.main.name, 'Second location');
     });
 
+    it('should allow an "entrace" and "exit" event', () => {
+        const gameObject = makeGame(true);
+        gameObject.locations.location1.onExit = () => {
+            game.print('You just leaved location1');
+        }
+        gameObject.locations.location2.onEnter = () => {
+            game.print('You just arrived in location2!');
+        }
+        const game = new Steller.Game(gameObject);
+        game.run();
+
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' }
+            ]
+        });
+
+        game.state.main.exits[0].text();
+
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'north', type: 'command' },
+                { text: 'You just leaved location1', type: 'normal' },
+                { text: 'You just arrived in location2!', type: 'normal' }
+            ]
+        });
+    });
+
     it('should have configurable exits', () => {
         const game = makeGame();
         game.run();
