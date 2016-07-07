@@ -90,6 +90,9 @@ function makeGame (onlyObject=false) {
         vars: {
             var3: 3
         },
+        actions: {
+            GlobalAction: 'Just a simple global action'
+        },
         properties: {
             propertable: {
                 lang: {
@@ -143,7 +146,7 @@ describe('Steller game', function() {
             text: 'Here the adventure begins',
             type: 'normal'
         }]});
-        assert.equal(game.state.main.actions.length, 4);
+        assert.equal(game.state.main.actions.length, 5);
         assert.equal(game.state.main.actions[0].name, 'Wait');
 
     });
@@ -170,6 +173,26 @@ describe('Steller game', function() {
 
         assert.isTrue(game.objectInInventory('object4'));
         assert.equal(_.keys(game.objectsInInventory()).length, 1);
+    });
+
+    it('should allow global actions', () => {
+        const game = makeGame();
+        game.run();
+
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: "Here the adventure begins", "type": "normal"}
+            ]
+        });
+        assert.equal(game.state.main.actions[4].name, 'GlobalAction');
+        game.state.main.actions[4].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: "Here the adventure begins", "type": "normal"},
+                { text: "globalaction", "type": "command"},
+                { text: "Just a simple global action", "type": "normal"}
+            ]
+        });
     });
 
     it('should move between locations', () => {
@@ -249,7 +272,7 @@ describe('Steller game', function() {
 
         game.locations.location1.actions.Look.available = false;
         game.refreshState();
-        assert.equal(game.state.main.actions.length, 3);
+        assert.equal(game.state.main.actions.length, 4);
     });
 
     it('should have configurable object actions', () => {
@@ -421,7 +444,7 @@ describe('Steller game', function() {
         assert.isFalse(game.state.locked);
         assert.equal(game.state.main.exits.length, 3);
         assert.equal(game.state.main.objects[0].actions.length, 2);
-        assert.equal(game.state.main.actions.length, 4);
+        assert.equal(game.state.main.actions.length, 5);
         assert.equal(game.state.inventory.objects[0].actions.length, 1);
 
         game.lockInteraction()
