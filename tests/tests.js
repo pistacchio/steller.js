@@ -34,6 +34,9 @@ function makeGame (onlyObject=false) {
                 },
                 vars: {
                     var1: 1
+                },
+                properties: {
+                    propertable: {}
                 }
             },
             location2: {
@@ -88,12 +91,22 @@ function makeGame (onlyObject=false) {
             var3: 3
         },
         properties: {
-            propertable (obj, game) {
-                return {
-                    SomeProperty: {
-                        command: 'use a propoerty',
-                        text: 'you just used a property'
+            propertable: {
+                lang: {
+                    en: {
+                        COMMAND: 'use a property',
+                        TEXT: 'You just used a property'
+                    },
+                    it: {
+                        COMMAND: 'usa una proprietà',
+                        TEXT: 'Hai appena usato una proprietà'
                     }
+                },
+                apply (target, options, game) {
+                    target.actions.SomeProperty = {
+                        command: game.texts.properties.propertable.COMMAND,
+                        text: game.texts.properties.propertable.TEXT,
+                    };
                 }
             }
         }
@@ -130,7 +143,7 @@ describe('Steller game', function() {
             text: 'Here the adventure begins',
             type: 'normal'
         }]});
-        assert.equal(game.state.main.actions.length, 3);
+        assert.equal(game.state.main.actions.length, 4);
         assert.equal(game.state.main.actions[0].name, 'Wait');
 
     });
@@ -236,7 +249,7 @@ describe('Steller game', function() {
 
         game.locations.location1.actions.Look.available = false;
         game.refreshState();
-        assert.equal(game.state.main.actions.length, 2);
+        assert.equal(game.state.main.actions.length, 3);
     });
 
     it('should have configurable object actions', () => {
@@ -408,7 +421,7 @@ describe('Steller game', function() {
         assert.isFalse(game.state.locked);
         assert.equal(game.state.main.exits.length, 3);
         assert.equal(game.state.main.objects[0].actions.length, 2);
-        assert.equal(game.state.main.actions.length, 3);
+        assert.equal(game.state.main.actions.length, 4);
         assert.equal(game.state.inventory.objects[0].actions.length, 1);
 
         game.lockInteraction()
@@ -446,14 +459,16 @@ describe('Steller game', function() {
         let game = makeGame();
         game.run();
 
+        assert.equal(game.texts.properties.propertable.COMMAND, game.properties.propertable.lang.en.COMMAND);
+
         assert.equal(game.state.main.objects[2].actions.length, 2);
         assert.equal(game.state.main.objects[2].actions[1].name, 'SomeProperty');
         game.state.main.objects[2].actions[1].text();
         assert.deepEqual(game.state.out, {
             texts: [
                 { text: 'Here the adventure begins', type: 'normal' },
-                { text: 'use a propoerty', type: 'command' },
-                { text: 'you just used a property', type: 'normal' }
+                { text: 'use a property', type: 'command' },
+                { text: 'You just used a property', type: 'normal' }
             ]
         });
     });

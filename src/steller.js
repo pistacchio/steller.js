@@ -36,23 +36,40 @@ const Steller = {
                 locked: false
             };
 
+            this.properties = Steller.utils.lightMerge(Steller.Properties, this.properties);
+
+
+            // extend lang for properties
+            for (let property in this.properties) {
+                if (this.properties[property].hasOwnProperty('lang')) {
+                    this.texts.properties[property] = this.properties[property].lang[this.lang];
+                }
+            }
+
             // prepare locations
             this.locations = _.mapValues(this.locations, (l, name) => {
-                return Steller.utils.lightMerge(l, {
+                let location = Steller.utils.lightMerge(l, {
                     id:          name,
                     initial:     false,
                     description: '',
                     exits:       [],
                     vars:        {},
-                    actions:     {}
+                    actions:     {},
+                    properties:  {}
                 });
+
+                for (let property in location.properties) {
+                    this.properties[property].apply(location, location.properties[property], this);
+                }
+
+                return location;
             });
 
             this.objects = Steller.utils.lightMerge(this.objects, _.get(options, 'characters', {}));
 
             // prepare objects
             this.objects = _.mapValues(this.objects, (o, name) => {
-                return Steller.utils.lightMerge(o, {
+                let object = Steller.utils.lightMerge(o, {
                     id:         name,
                     name:       {},
                     location:   null,
@@ -60,9 +77,13 @@ const Steller = {
                     vars:       {},
                     properties: {},
                 });
-            });
 
-            this.properties = Steller.utils.lightMerge(Steller.Properties, this.properties);
+                for (let property in object.properties) {
+                    this.properties[property].apply(object, object.properties[property], this);
+                }
+
+                return object;
+            });
 
             for (let object of _.get(options, 'inventory', [])) {
                 this.objects[object].location = Steller.INVENTORY;
@@ -163,21 +184,6 @@ const Steller = {
 
             if (!this.state.locked) {
                 let availableActions = _.pickBy(obj.actions, a => a.available !== false);
-
-                for (let propertyName in obj.properties) {
-                    let properties = this.properties[propertyName](obj, self);
-                    for (let property in properties) {
-                        properties[property] = Steller.utils.lightMerge(obj.properties[propertyName], properties[property]);
-                        properties[property] = Steller.utils.lightMerge(properties[property], {
-                            command:       '',
-                            text:          '',
-                            available:     true,
-                            beforeText:    () => '',
-                            afterText:     () => ''
-                        });
-                    }
-                    availableActions = Steller.utils.lightMerge(availableActions, properties);
-                }
 
                 availableActions = _.pickBy(availableActions, a => a.available !== false);
 
