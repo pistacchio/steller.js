@@ -185,7 +185,7 @@ Steller.Properties = {
                               let command = options.topics[topic].hasOwnProperty('command') ? options.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
 
                               game.printCommand(command);
-                              game.print(options.topics[topic].text);
+                              game.print(options.topics[topic].text, 'dialogue');
                           }
                       })
                   }

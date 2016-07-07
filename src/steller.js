@@ -17,6 +17,7 @@ const Steller = {
             this.properties        = _.get(options, 'properties', {});
             this.everyturn         = _.get(options, 'everyturn', () => {});
             this.texts             = Steller.Lang[this.lang];
+            this.formatters        = _.get(options, 'formatters', {});;
 
             this.state = {
                 header:    {
@@ -37,6 +38,10 @@ const Steller = {
             };
 
             this.properties = Steller.utils.lightMerge(Steller.Properties, this.properties);
+            let formatters = Steller.utils.lightMerge(Steller.Formatters, this.formatters);
+            for (let formatter in formatters) {
+                this.formatters[formatter] = formatters[formatter][this.lang];
+            }
 
             // extend lang for properties
             for (let property in this.properties) {
@@ -447,7 +452,8 @@ const Steller = {
         },
     },
 
-    Properties: {}
+    Properties: {},
+    Formatters: {}
 };
 
 /* istanbul ignore next */

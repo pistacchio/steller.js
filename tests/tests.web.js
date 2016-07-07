@@ -84,6 +84,16 @@ describe('Steller web game', () => {
         assert.equal($('#container .output').text(), 'Here the adventure begins');
     });
 
+    it('should use formatters', function () {
+        const game = makeGame();
+        game.run();
+
+        $('#container .main .objects a').eq(1).click();
+        $('#container .actions a').eq(0).click();
+
+        assert.equal($('#container .output .dialogue').html(), '<em>"Wow, il rains!"</em>');
+    });
+
     it('should display locations', function () {
         const game = makeGame();
         game.run();

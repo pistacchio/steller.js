@@ -31,6 +31,7 @@ var Steller = {
             this.properties = _.get(options, 'properties', {});
             this.everyturn = _.get(options, 'everyturn', function () {});
             this.texts = Steller.Lang[this.lang];
+            this.formatters = _.get(options, 'formatters', {});;
 
             this.state = {
                 header: {
@@ -51,6 +52,10 @@ var Steller = {
             };
 
             this.properties = Steller.utils.lightMerge(Steller.Properties, this.properties);
+            var formatters = Steller.utils.lightMerge(Steller.Formatters, this.formatters);
+            for (var formatter in formatters) {
+                this.formatters[formatter] = formatters[formatter][this.lang];
+            }
 
             // extend lang for properties
             for (var property in this.properties) {
@@ -551,7 +556,8 @@ var Steller = {
         }
     },
 
-    Properties: {}
+    Properties: {},
+    Formatters: {}
 };
 
 /* istanbul ignore next */
@@ -752,7 +758,7 @@ Steller.Properties = {
                                 var command = options.topics[topic].hasOwnProperty('command') ? options.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
 
                                 game.printCommand(command);
-                                game.print(options.topics[topic].text);
+                                game.print(options.topics[topic].text, 'dialogue');
                             }
                         });
                     };
@@ -785,6 +791,12 @@ Steller.Properties = {
                 }
             };
         }
+    }
+};
+Steller.Formatters = {
+    dialogue: {
+        en: '<div class="dialogue"><em>"{0}"</em></div>',
+        it: '<div class="dialogue"><em>"{0}"</em></div>'
     }
 };
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -948,16 +960,21 @@ Steller.Web = {
                         for (var _iterator3 = val.texts[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                             var text = _step3.value;
 
-                            switch (text.type) {
-                                case 'command':
-                                    $output.append('<div class="command">> ' + text.text + '</div>');
-                                    break;
-                                case 'score':
-                                    $output.append('<div class="score">' + Steller.utils.formatText(self.texts.ui.SCORE_UP, text.text) + '</div>');
-                                    break;
-                                default:
-                                    $output.append('<div>' + text.text + '</div>');
-                                    break;
+                            // console.log(text.type);
+                            if (_this.formatters.hasOwnProperty(text.type)) {
+                                $output.append(Steller.utils.formatText(_this.formatters[text.type], text.text));
+                            } else {
+                                switch (text.type) {
+                                    case 'command':
+                                        $output.append('<div class="command">> ' + text.text + '</div>');
+                                        break;
+                                    case 'score':
+                                        $output.append('<div class="score">' + Steller.utils.formatText(self.texts.ui.SCORE_UP, text.text) + '</div>');
+                                        break;
+                                    default:
+                                        $output.append('<div>' + text.text + '</div>');
+                                        break;
+                                }
                             }
                         }
                     } catch (err) {

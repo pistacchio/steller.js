@@ -243,7 +243,7 @@ describe('Steller standard library', function() {
                 { text: 'talk', type: 'command' },
                 { text: 'talking', type: 'normal' },
                 { text: 'talk about Weather', type: 'command' },
-                { text: 'Wow, il rains!', type: 'normal' }
+                { text: 'Wow, il rains!', type: 'dialogue' }
             ]
         });
         assert.isTrue(game.state.locked);
@@ -260,7 +260,7 @@ describe('Steller standard library', function() {
                 { text: 'talk', type: 'command' },
                 { text: 'talking', type: 'normal' },
                 { text: 'talk about Weather', type: 'command' },
-                { text: 'Wow, il rains!', type: 'normal' },
+                { text: 'Wow, il rains!', type: 'dialogue' },
                 { text: 'end conversation', type: 'command' }
             ]
         });
@@ -303,7 +303,7 @@ describe('Steller standard library', function() {
                 { text: 'talk to the talking object', type: 'command' },
                 { text: '... talking softly ...', type: 'normal' },
                 { text: 'you ask about the weather', type: 'command' },
-                { text: 'Wow, il rains!', type: 'normal' },
+                { text: 'Wow, il rains!', type: 'dialogue' },
                 { text: 'suddenly ed the conversation', type: 'command' },
                 { text: 'You are tired of talking. Bye!', type: 'normal' }
             ]

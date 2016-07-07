@@ -218,16 +218,21 @@ Steller.Web = {
 
                     $output.html('');
                     for (let text of val.texts) {
-                        switch(text.type) {
-                            case 'command':
-                                $output.append(`<div class="command">> ${text.text}</div>`)
-                                break;
-                            case 'score':
-                                $output.append(`<div class="score">${Steller.utils.formatText(self.texts.ui.SCORE_UP, text.text)}</div>`)
-                                break;
-                            default:
-                                $output.append(`<div>${text.text}</div>`)
-                                break;
+                        // console.log(text.type);
+                        if (this.formatters.hasOwnProperty(text.type)) {
+                            $output.append(Steller.utils.formatText(this.formatters[text.type], text.text));
+                        } else {
+                            switch(text.type) {
+                                case 'command':
+                                    $output.append(`<div class="command">> ${text.text}</div>`)
+                                    break;
+                                case 'score':
+                                    $output.append(`<div class="score">${Steller.utils.formatText(self.texts.ui.SCORE_UP, text.text)}</div>`)
+                                    break;
+                                default:
+                                    $output.append(`<div>${text.text}</div>`)
+                                    break;
+                            }
                         }
                     }
 

@@ -112,6 +112,12 @@ function makeGame (onlyObject=false) {
                     };
                 }
             }
+        },
+        formatters: {
+            sample: {
+                en: 'something {0}',
+                it: 'qualcosa {0}'
+            }
         }
     };
 
