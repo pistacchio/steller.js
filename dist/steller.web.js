@@ -13,6 +13,8 @@ var Steller = {
     INVENTORY: '__inventory__',
     Game: function () {
         function Game(options) {
+            var _this = this;
+
             _classCallCheck(this, Game);
 
             this.lang = _.get(options, 'lang', 'en');
@@ -46,23 +48,39 @@ var Steller = {
                 locked: false
             };
 
+            this.properties = Steller.utils.lightMerge(Steller.Properties, this.properties);
+
+            // extend lang for properties
+            for (var property in this.properties) {
+                if (this.properties[property].hasOwnProperty('lang')) {
+                    this.texts.properties[property] = this.properties[property].lang[this.lang];
+                }
+            }
+
             // prepare locations
             this.locations = _.mapValues(this.locations, function (l, name) {
-                return Steller.utils.lightMerge(l, {
+                var location = Steller.utils.lightMerge(l, {
                     id: name,
                     initial: false,
                     description: '',
                     exits: [],
                     vars: {},
-                    actions: {}
+                    actions: {},
+                    properties: {}
                 });
+
+                for (var _property in location.properties) {
+                    _this.properties[_property].apply(location, location.properties[_property], _this);
+                }
+
+                return location;
             });
 
             this.objects = Steller.utils.lightMerge(this.objects, _.get(options, 'characters', {}));
 
             // prepare objects
             this.objects = _.mapValues(this.objects, function (o, name) {
-                return Steller.utils.lightMerge(o, {
+                var object = Steller.utils.lightMerge(o, {
                     id: name,
                     name: {},
                     location: null,
@@ -70,9 +88,13 @@ var Steller = {
                     vars: {},
                     properties: {}
                 });
-            });
 
-            this.properties = Steller.utils.lightMerge(Steller.Properties, this.properties);
+                for (var _property2 in object.properties) {
+                    _this.properties[_property2].apply(object, object.properties[_property2], _this);
+                }
+
+                return object;
+            });
 
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -119,7 +141,7 @@ var Steller = {
         }, {
             key: 'describeCurrentLocation',
             value: function describeCurrentLocation() {
-                var _this = this;
+                var _this2 = this;
 
                 // actions
                 var actions = this.state.locked ? [] : this.currentLocation.actions;
@@ -149,8 +171,8 @@ var Steller = {
                     outputActions.push({
                         name: ac.name,
                         text: function text() {
-                            _this.printCommand(ac.command);
-                            _this.print(ac.text);
+                            _this2.printCommand(ac.command);
+                            _this2.print(ac.text);
                         }
                     });
                 };
@@ -187,7 +209,7 @@ var Steller = {
                     outputExits.push({
                         name: exit,
                         text: function text() {
-                            _this.gotoLocation(ex.text, ex.command);
+                            _this2.gotoLocation(ex.text, ex.command);
                         }
                     });
                 };
@@ -223,25 +245,6 @@ var Steller = {
                     var availableActions = _.pickBy(obj.actions, function (a) {
                         return a.available !== false;
                     });
-
-                    for (var propertyName in obj.properties) {
-                        var properties = this.properties[propertyName](obj, self);
-                        for (var property in properties) {
-                            properties[property] = Steller.utils.lightMerge(obj.properties[propertyName], properties[property]);
-                            properties[property] = Steller.utils.lightMerge(properties[property], {
-                                command: '',
-                                text: '',
-                                available: true,
-                                beforeText: function beforeText() {
-                                    return '';
-                                },
-                                afterText: function afterText() {
-                                    return '';
-                                }
-                            });
-                        }
-                        availableActions = Steller.utils.lightMerge(availableActions, properties);
-                    }
 
                     availableActions = _.pickBy(availableActions, function (a) {
                         return a.available !== false;
@@ -319,11 +322,11 @@ var Steller = {
         }, {
             key: 'updateInventory',
             value: function updateInventory() {
-                var _this2 = this;
+                var _this3 = this;
 
                 this.state.inventory = {
                     objects: _.map(this.objectsInInventory(), function (o) {
-                        return _this2.prepareObject(o);
+                        return _this3.prepareObject(o);
                     })
                 };
             }
@@ -508,198 +511,233 @@ var Steller = {
 if (this.window === undefined) {
     module.exports = Steller;
 }
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 /* istanbul ignore next */
 if (this.window === undefined) {
     Steller = require('../src/steller.js');
 }
 
-Steller.Lang.en.properties.movable = {
-    DROP: 'Drop',
-    TAKE: 'Take',
-    DROPPED: 'Dropped',
-    TAKEN: 'Taken'
-};
-Steller.Lang.en.properties.usableWith = {
-    USE_WITH: 'Use with',
-    USE: 'use',
-    USE_OBJ: 'use {0}',
-    USE_WITH_OBJ: 'use {0} with {1}',
-    USING: 'using',
-    NOTHING: 'Nothing happens'
-};
-Steller.Lang.en.properties.talkable = {
-    TALK: 'Talk',
-    TALK_TO: 'talk to {0}',
-    TALK_ABOUT_TOPIC: 'talk about {0}',
-    TALK_ABOUT: 'Talk about',
-    DONE: 'Done',
-    END: 'end conversation',
-    TALKING: 'talking'
-};
-
-Steller.Lang.it.properties.movable = {
-    DROP: 'Lascia',
-    TAKE: 'Prendi',
-    DROPPED: 'Lasciato',
-    TAKEN: 'Preso'
-};
-Steller.Lang.it.properties.usableWith = {
-    USE_WITH: 'Usa con',
-    USE: 'usa',
-    USE_OBJ: 'usa {0}',
-    USE_WITH_OBJ: 'usa {0} con {1}',
-    USING: 'usando..,',
-    NOTHING: 'Non succede nulla'
-};
-Steller.Lang.it.properties.talkable = {
-    TALK: 'Parla',
-    TALK_TO: 'parla con {0}',
-    TALK_ABOUT_TOPIC: 'parla di {0}',
-    TALK_ABOUT: 'Parla di',
-    DONE: 'Fatto',
-    END: 'termina conversazione',
-    TALKING: 'parlando...'
-};
-
 Steller.Properties = {
-    movable: function movable(obj, game) {
-        return _defineProperty({}, game.objectInInventory(obj.id) ? game.texts.properties.movable.DROP : game.texts.properties.movable.TAKE, {
-            get command() {
-                if (this.hasOwnProperty('objectName')) {
-                    return (game.objectInInventory(obj.id) ? game.texts.properties.movable.DROP.toLowerCase() : game.texts.properties.movable.TAKE.toLowerCase()) + ' ' + this.objectName;
-                }
-                if (game.objectInInventory(obj.id) && this.hasOwnProperty('dropCommand')) {
-                    return this.dropCommand;
-                }
-                if (!game.objectInInventory(obj.id) && this.hasOwnProperty('takeCommand')) {
-                    return this.takeCommand;
-                }
-
-                return game.objectInInventory(obj.id) ? game.texts.properties.movable.DROP.toLowerCase() : game.texts.properties.movable.TAKE.toLowerCase();
+    movable: {
+        lang: {
+            en: {
+                DROP: 'Drop',
+                TAKE: 'Take',
+                DROPPED: 'Dropped',
+                TAKEN: 'Taken'
             },
-            get text() {
-                if (game.objectInInventory(obj.id)) {
-                    game.moveObjectToLocation(obj.id);
-                    return game.texts.properties.movable.DROPPED;
-                } else {
-                    game.moveObjectToInventory(obj.id);
-                    return game.texts.properties.movable.TAKEN;
-                }
+            it: {
+                DROP: 'Lascia',
+                TAKE: 'Prendi',
+                DROPPED: 'Lasciato',
+                TAKEN: 'Preso'
             }
-        });
-    },
-    usableWith: function usableWith(obj, game) {
-        return _defineProperty({}, game.texts.properties.usableWith.USE_WITH, {
-            get command() {
-                if (this.hasOwnProperty('objectName')) {
-                    return Steller.utils.formatText(game.texts.properties.usableWith.USE_WITH, this.objectName);
-                } else {
-                    return game.texts.properties.usableWith.USE;
+        },
+        apply: function apply(target, options, game) {
+            target.actions[game.texts.properties.movable.TAKE] = {
+                get command() {
+                    if (options.hasOwnProperty('takeCommand')) {
+                        return options.takeCommand;
+                    }
+                    if (options.hasOwnProperty('objectName')) {
+                        return game.texts.properties.movable.TAKE.toLowerCase() + ' ' + options.objectName;
+                    }
+                    return game.texts.properties.movable.TAKE.toLowerCase();
+                },
+                get text() {
+                    game.moveObjectToInventory(target.id);
+                    if (options.hasOwnProperty('takeText')) {
+                        return options.takeText;
+                    }
+                    return game.texts.properties.movable.TAKEN;
+                },
+                get available() {
+                    return !game.objectInInventory(target.id);
                 }
+            };
+
+            target.actions[game.texts.properties.movable.DROP] = {
+                get command() {
+                    if (options.hasOwnProperty('dropCommand')) {
+                        return options.dropCommand;
+                    }
+                    if (options.hasOwnProperty('objectName')) {
+                        return game.texts.properties.movable.DROP.toLowerCase() + ' ' + options.objectName;
+                    }
+                    return game.texts.properties.movable.DROP.toLowerCase();
+                },
+                get text() {
+                    game.moveObjectToLocation(target.id);
+                    if (options.hasOwnProperty('dropText')) {
+                        return options.dropText;
+                    }
+                    return game.texts.properties.movable.DROPPED;
+                },
+                get available() {
+                    return game.objectInInventory(target.id);
+                }
+            };
+        }
+    },
+
+    usableWith: {
+        lang: {
+            en: {
+                USE_WITH: 'Use with',
+                USE: 'use',
+                USE_OBJ: 'use {0}',
+                USE_WITH_OBJ: 'use {0} with {1}',
+                USING: 'using',
+                NOTHING: 'Nothing happens'
             },
-            get text() {
-                var self = this;
-                var actions = [];
-                var availableObjects = Steller.utils.lightMerge(game.objectsInLocation(), game.objectsInInventory());
-                availableObjects = _.pickBy(availableObjects, function (o) {
-                    return o.id !== obj.id;
-                });
+            it: {
+                USE_WITH: 'Usa con',
+                USE: 'usa',
+                USE_OBJ: 'usa {0}',
+                USE_WITH_OBJ: 'usa {0} con {1}',
+                USING: 'usando..,',
+                NOTHING: 'Non succede nulla'
+            }
+        },
+        apply: function apply(target, options, game) {
+            target.actions[game.texts.properties.usableWith.USE_WITH] = {
+                get command() {
+                    if (options.hasOwnProperty('command')) {
+                        return options.command;
+                    }
 
-                var interactions = self.hasOwnProperty('interactions') ? self.interactions : {};
+                    if (options.hasOwnProperty('objectName')) {
+                        return Steller.utils.formatText(game.texts.properties.usableWith.USE_WITH, options.objectName);
+                    } else {
+                        return game.texts.properties.usableWith.USE;
+                    }
+                },
+                get text() {
+                    var self = this;
+                    var actions = [];
+                    var availableObjects = Steller.utils.lightMerge(game.objectsInLocation(), game.objectsInInventory());
+                    availableObjects = _.pickBy(availableObjects, function (o) {
+                        return o.id !== target.id;
+                    });
 
-                var _loop = function _loop(object) {
-                    actions.push({
-                        name: availableObjects[object].name,
-                        text: function text() {
-                            var command = Steller.utils.formatText(game.texts.properties.usableWith.USE_WITH_OBJ, obj.name, availableObjects[object].name);
-                            var text = game.texts.properties.usableWith.NOTHING;
+                    var interactions = options.hasOwnProperty('interactions') ? options.interactions : {};
 
-                            if (interactions.hasOwnProperty(object)) {
-                                if (interactions[object].hasOwnProperty('command')) command = interactions[object].command;
-                                if (interactions[object].hasOwnProperty('text')) text = interactions[object].text;
-                            } else {
-                                if (interactions.hasOwnProperty('default')) text = interactions.default;
+                    var _loop = function _loop(object) {
+                        actions.push({
+                            name: availableObjects[object].name,
+                            text: function text() {
+                                var command = Steller.utils.formatText(game.texts.properties.usableWith.USE_WITH_OBJ, target.name, availableObjects[object].name);
+
+                                var text = game.texts.properties.usableWith.NOTHING;
+
+                                if (interactions.hasOwnProperty(object)) {
+                                    if (interactions[object].hasOwnProperty('command')) command = interactions[object].command;
+                                    if (interactions[object].hasOwnProperty('text')) text = interactions[object].text;
+                                } else {
+                                    if (interactions.hasOwnProperty('default')) text = interactions.default;
+                                }
+
+                                game.printCommand(command);
+                                game.print(text);
+                                game.unlockInteraction();
+                                game.state.action = {};
                             }
+                        });
+                    };
+
+                    for (var object in availableObjects) {
+                        _loop(object);
+                    }
+
+                    game.lockInteraction();
+                    game.state.action = {
+                        title: options.hasOwnProperty('title') ? options.title : game.texts.properties.usableWith.USE_WITH,
+                        actions: actions
+                    };
+                    return options.hasOwnProperty('usingText') ? options.usingText : game.texts.properties.usableWith.USING;
+                },
+                get available() {
+                    return game.objectInInventory(target.id);
+                }
+            };
+        }
+    },
+
+    talkable: {
+        lang: {
+            en: {
+                TALK: 'Talk',
+                TALK_TO: 'talk to {0}',
+                TALK_ABOUT_TOPIC: 'talk about {0}',
+                TALK_ABOUT: 'Talk about',
+                DONE: 'Done',
+                END: 'end conversation',
+                TALKING: 'talking'
+            },
+            it: {
+                TALK: 'Parla',
+                TALK_TO: 'parla con {0}',
+                TALK_ABOUT_TOPIC: 'parla di {0}',
+                TALK_ABOUT: 'Parla di',
+                DONE: 'Fatto',
+                END: 'termina conversazione',
+                TALKING: 'parlando...'
+
+            }
+        },
+        apply: function apply(target, options, game) {
+            target.actions[game.texts.properties.talkable.TALK] = {
+                get command() {
+                    if (options.hasOwnProperty('objectName')) {
+                        return Steller.utils.formatText(game.texts.properties.talkable.TALK_TO, options.objectName);
+                    } else {
+                        return game.texts.properties.talkable.TALK.toLowerCase();
+                    }
+                },
+                get text() {
+                    var self = this;
+                    var actions = [];
+
+                    var _loop2 = function _loop2(topic) {
+                        if (options.topics[topic].hasOwnProperty('available') && !options.topics[topic].available) return 'continue';
+                        actions.push({
+                            name: topic,
+                            text: function text() {
+                                var command = options.topics[topic].hasOwnProperty('command') ? options.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
+
+                                game.printCommand(command);
+                                game.print(options.topics[topic].text);
+                            }
+                        });
+                    };
+
+                    for (var topic in options.topics) {
+                        var _ret2 = _loop2(topic);
+
+                        if (_ret2 === 'continue') continue;
+                    }
+
+                    actions.push({
+                        name: options.hasOwnProperty('doneName') ? options.doneName : game.texts.properties.talkable.DONE,
+                        text: function text() {
+                            var command = options.hasOwnProperty('doneCommand') ? options.doneCommand : game.texts.properties.talkable.END;
 
                             game.printCommand(command);
-                            game.print(text);
+                            if (options.hasOwnProperty('doneText')) game.print(options.doneText);
                             game.unlockInteraction();
                             game.state.action = {};
                         }
                     });
-                };
 
-                for (var object in availableObjects) {
-                    _loop(object);
+                    game.lockInteraction();
+                    game.state.action = {
+                        title: options.hasOwnProperty('title') ? options.title : game.texts.properties.talkable.TALK_ABOUT,
+                        actions: actions
+                    };
+
+                    return options.hasOwnProperty('talkingText') ? options.talkingText : game.texts.properties.talkable.TALKING;
                 }
-
-                game.lockInteraction();
-                game.state.action = {
-                    title: self.hasOwnProperty('title') ? self.title : game.texts.properties.usableWith.USE_WITH,
-                    actions: actions
-                };
-                return self.hasOwnProperty('usingText') ? self.usingText : game.texts.properties.usableWith.USING;
-            },
-            get available() {
-                return game.objectInInventory(obj.id);
-            }
-        });
-    },
-    talkable: function talkable(obj, game) {
-        return _defineProperty({}, game.texts.properties.talkable.TALK, {
-            get command() {
-                if (this.hasOwnProperty('objectName')) {
-                    return Steller.utils.formatText(game.texts.properties.talkable.TALK_TO, this.objectName);
-                } else {
-                    return game.texts.properties.talkable.TALK.toLowerCase();
-                }
-            },
-            get text() {
-                var self = this;
-                var actions = [];
-
-                var _loop2 = function _loop2(topic) {
-                    if (self.topics[topic].hasOwnProperty('available') && !self.topics[topic].available) return 'continue';
-                    actions.push({
-                        name: topic,
-                        text: function text() {
-                            var command = self.topics[topic].hasOwnProperty('command') ? self.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
-
-                            game.printCommand(command);
-                            game.print(self.topics[topic].text);
-                        }
-                    });
-                };
-
-                for (var topic in self.topics) {
-                    var _ret2 = _loop2(topic);
-
-                    if (_ret2 === 'continue') continue;
-                }
-
-                actions.push({
-                    name: self.hasOwnProperty('doneName') ? self.doneName : game.texts.properties.talkable.DONE,
-                    text: function text() {
-                        var command = self.hasOwnProperty('doneCommand') ? self.doneCommand : game.texts.properties.talkable.END;
-
-                        game.printCommand(command);
-                        if (self.hasOwnProperty('doneText')) game.print(self.doneText);
-                        game.unlockInteraction();
-                        game.state.action = {};
-                    }
-                });
-
-                game.lockInteraction();
-                game.state.action = {
-                    title: self.hasOwnProperty('title') ? self.title : game.texts.properties.talkable.TALK_ABOUT,
-                    actions: actions
-                };
-
-                return self.hasOwnProperty('talkingText') ? self.talkingText : game.texts.properties.talkable.TALKING;
-            }
-        });
+            };
+        }
     }
 };
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -868,7 +906,7 @@ Steller.Web = {
                                     $output.append('<div class="command">> ' + text.text + '</div>');
                                     break;
                                 case 'score':
-                                    $output.append('<div class="score">' + Steller.utils.translate(self.texts.ui.SCORE_UP, text.text) + '</div>');
+                                    $output.append('<div class="score">' + Steller.utils.formatText(self.texts.ui.SCORE_UP, text.text) + '</div>');
                                     break;
                                 default:
                                     $output.append('<div>' + text.text + '</div>');

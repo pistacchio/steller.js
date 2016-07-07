@@ -7,7 +7,7 @@
     "testcore": "mocha tests/tests.js",
     "coveragecore": "istanbul cover --report html node_modules/.bin/_mocha tests/tests.js; open coverage/index.html",
     "testlib": "mocha tests/tests.lib.js",
-    "coveraglib": "istanbul cover --report html node_modules/.bin/_mocha tests/tests.lib.js; open coverage/index.html",
+    "coveragelib": "istanbul cover --report html node_modules/.bin/_mocha tests/tests.lib.js; open coverage/index.html",
     "buildweb": "mkdir dist; cp node_modules/lodash/lodash.min.js dist/lodash.js; cp node_modules/jquery/dist/jquery.min.js dist/jquery.js; babel src/steller.js --presets es2015-script --out-file dist/steller.babel.js; babel src/steller.lib.js --presets es2015-script --out-file dist/steller.lib.babel.js; babel src/steller.web.js --presets es2015-script --out-file dist/steller.web.babel.js; cat node_modules/babel-polyfill/dist/polyfill.min.js dist/steller.babel.js dist/steller.lib.babel.js dist/steller.web.babel.js > dist/steller.web.js; rm dist/steller.babel.js; rm dist/steller.lib.babel.js; rm dist/steller.web.babel.js",
     "testweb": "karma start tests/karma.conf.js;",
     "coverageweb": "open coverage/src/steller.web.js.html"

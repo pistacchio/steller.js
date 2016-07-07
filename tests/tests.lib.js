@@ -24,12 +24,6 @@ function makeGame (onlyObject=false) {
                 properties: {
                     movable: {
                         objectName: 'the object',
-                        beforeText () {
-                            game.print('before move');
-                        },
-                        afterText () {
-                            game.print('after move');
-                        }
                     },
                     usableWith: {
                         usingText: 'using object 1, yeah!'
@@ -49,7 +43,9 @@ function makeGame (onlyObject=false) {
                 properties: {
                     movable: {
                         dropCommand: 'drop it!',
-                        takeCommand: 'take it!'
+                        takeCommand: 'take it!',
+                        dropText: 'yeah, dropped!',
+                        takeText: 'yeah, taken!'
                     },
                     usableWith: {
                         title: 'Object 2 Use With',
@@ -92,7 +88,7 @@ function makeGame (onlyObject=false) {
 }
 
 describe('Steller standard library', function() {
-    it('should handle takeable objects', () => {
+    it('should handle movable objects', () => {
         const game = makeGame();
         game.run();
 
@@ -110,20 +106,16 @@ describe('Steller standard library', function() {
         assert.deepEqual(game.state.out, {
             texts: [
                 { text: '', type: 'normal' },
-                { text: 'before move', type: 'normal' },
                 { text: 'take the object', type: 'command' },
                 { text: 'Taken', type: 'normal' },
-                { text: 'after move', type: 'normal' },
                 { text: 'take it!', type: 'command' },
-                { text: 'Taken', type: 'normal' },
+                { text: 'yeah, taken!', type: 'normal' },
                 { text: 'take', type: 'command' },
                 { text: 'Taken', type: 'normal' },
-                { text: 'before move', type: 'normal' },
                 { text: 'drop the object', type: 'command' },
                 { text: 'Dropped', type: 'normal' },
-                { text: 'after move', type: 'normal' },
                 { text: 'drop it!', type: 'command' },
-                { text: 'Dropped', type: 'normal' },
+                { text: 'yeah, dropped!', type: 'normal' },
                 { text: 'drop', type: 'command' },
                 { text: 'Dropped', type: 'normal' }
             ]
@@ -191,16 +183,14 @@ describe('Steller standard library', function() {
         assert.deepEqual(game.state.out, {
             texts: [
                 { text: '', type: 'normal' },
-                { text: 'before move', type: 'normal' },
                 { text: 'take the object', type: 'command' },
                 { text: 'Taken', type: 'normal' },
-                { text: 'after move', type: 'normal' },
                 { text: 'use', type: 'command' },
                 { text: 'using object 1, yeah!', type: 'normal' },
                 { text: 'use Object 1 with Object 2', type: 'command' },
                 { text: 'Nothing happens', type: 'normal' },
                 { text: 'take it!', type: 'command' },
-                { text: 'Taken', type: 'normal' },
+                { text: 'yeah, taken!', type: 'normal' },
                 { text: 'you try to use Object 2', type: 'command' },
                 { text: 'using', type: 'normal' },
                 { text: 'use with object 3', type: 'command' },

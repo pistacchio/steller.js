@@ -38,7 +38,6 @@ const Steller = {
 
             this.properties = Steller.utils.lightMerge(Steller.Properties, this.properties);
 
-
             // extend lang for properties
             for (let property in this.properties) {
                 if (this.properties[property].hasOwnProperty('lang')) {
