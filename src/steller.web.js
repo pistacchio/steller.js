@@ -1,3 +1,25 @@
+Steller.Lang.en.ui = {
+    SAVE:      'Save',
+    RESTORE:   'Restore',
+    EXITS:     'Exits',
+    YOU_SEE:   'You can also see',
+    ACTIONS:   'Actions',
+    SCORE_UP:  'Your score just went up to {0}!',
+    SCORE:     'Score',
+    INVENTORY: 'You carry'
+};
+Steller.Lang.it.ui = {
+    SAVE:      'Salva',
+    RESTORE:   'Ricarica',
+    EXITS:     'Uscite',
+    YOU_SEE:   'Vedi anche',
+    ACTIONS:   'Azioni',
+    SCORE_UP:  'Il tuo punteggio è appena saluto a {0}!',
+    SCORE:     'Punteggio',
+    INVENTORY: 'Hai'
+};
+
+
 Steller.Web = {
     Game: class extends Steller.Game {
         constructor (options, $container) {
