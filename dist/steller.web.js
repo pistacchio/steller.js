@@ -79,6 +79,11 @@ var Steller = {
                     }
                 }
 
+                for (var object in location.objects) {
+                    location.objects[object].location = name;
+                    _this.objects[object] = location.objects[object];
+                }
+
                 return location;
             });
 
@@ -360,6 +365,12 @@ var Steller = {
                 return _.pickBy(this.objects, function (o) {
                     return o.location === locationName;
                 });
+            }
+        }, {
+            key: 'objectIsInLocation',
+            value: function objectIsInLocation(objectName, locationName) {
+                if (locationName === undefined) locationName = this._currentLocation;
+                return this.objects[objectName].location === locationName;
             }
         }, {
             key: 'moveObjectToLocation',
