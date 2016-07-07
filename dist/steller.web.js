@@ -73,6 +73,12 @@ var Steller = {
                     _this.properties[_property].apply(location, location.properties[_property], _this);
                 }
 
+                for (var action in location.actions) {
+                    if (Object.getOwnPropertyDescriptor(location.actions, action).get !== undefined) {
+                        throw 'Location "' + name + '": do not use getters for actions. You can customize their behavior using an object instead';
+                    }
+                }
+
                 return location;
             });
 
@@ -93,8 +99,20 @@ var Steller = {
                     _this.properties[_property2].apply(object, object.properties[_property2], _this);
                 }
 
+                for (var action in object.actions) {
+                    if (Object.getOwnPropertyDescriptor(object.actions, action).get !== undefined) {
+                        throw 'Object "' + name + '": do not use getters for actions. You can customize their behavior using an object instead';
+                    }
+                }
+
                 return object;
             });
+
+            for (var action in this.actions) {
+                if (Object.getOwnPropertyDescriptor(this.actions, action).get !== undefined) {
+                    throw 'Do not use getters for actions. You can customize their behavior using an object instead';
+                }
+            }
 
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;

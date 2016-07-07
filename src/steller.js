@@ -61,6 +61,12 @@ const Steller = {
                     this.properties[property].apply(location, location.properties[property], this);
                 }
 
+                for (let action in location.actions) {
+                    if (Object.getOwnPropertyDescriptor(location.actions, action).get !== undefined) {
+                        throw(`Location "${name}": do not use getters for actions. You can customize their behavior using an object instead`);
+                    }
+                }
+
                 return location;
             });
 
@@ -81,8 +87,20 @@ const Steller = {
                     this.properties[property].apply(object, object.properties[property], this);
                 }
 
+                for (let action in object.actions) {
+                    if (Object.getOwnPropertyDescriptor(object.actions, action).get !== undefined) {
+                        throw(`Object "${name}": do not use getters for actions. You can customize their behavior using an object instead`);
+                    }
+                }
+
                 return object;
             });
+
+            for (let action in this.actions) {
+                if (Object.getOwnPropertyDescriptor(this.actions, action).get !== undefined) {
+                    throw(`Do not use getters for actions. You can customize their behavior using an object instead`);
+                }
+            }
 
             for (let object of _.get(options, 'inventory', [])) {
                 this.objects[object].location = Steller.INVENTORY;

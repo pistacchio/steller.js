@@ -132,6 +132,33 @@ describe('Steller game', function() {
         assert.throws(() => brokenGame.run(), 'No initial location');
     });
 
+    it('should not allow getters in actions', () => {
+        let gameObject = makeGame(true);
+        gameObject.actions = {
+            get BrokenAction () {
+                return 'Not working';
+            }
+        };
+        assert.throws(() => new Steller.Game(gameObject), 'Do not use getters for actions. You can customize their behavior using an object instead');
+
+        gameObject = makeGame(true);
+        gameObject.locations.location1.actions = {
+            get BrokenAction () {
+                return 'Not working';
+            }
+        };
+        assert.throws(() => new Steller.Game(gameObject), 'Location "location1": do not use getters for actions. You can customize their behavior using an object instead');
+
+        gameObject = makeGame(true);
+        gameObject.objects.object1.actions = {
+            get BrokenAction () {
+                return 'Not working';
+            }
+        };
+        assert.throws(() => new Steller.Game(gameObject), 'Object "object1": do not use getters for actions. You can customize their behavior using an object instead');
+
+    });
+
     it('should describe the initial location', () => {
         const game = makeGame();
         game.run();
