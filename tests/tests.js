@@ -156,7 +156,6 @@ describe('Steller game', function() {
             }
         };
         assert.throws(() => new Steller.Game(gameObject), 'Object "object1": do not use getters for actions. You can customize their behavior using an object instead');
-
     });
 
     it('should describe the initial location', () => {
@@ -200,6 +199,34 @@ describe('Steller game', function() {
         assert.equal(game.state.main.objects[3].name, 'Object 5');
         assert.isTrue(game.objectIsInLocation('object5'));
         assert.isTrue(game.objectIsInLocation('object5', 'location1'));
+    });
+
+    it('should allow object declaration withing locations with a shortcut syntax', () => {
+        let gameObject = makeGame(true);
+        gameObject.locations.location1.objects = {
+            get Object5 () { return "A nice object" }
+        };
+        assert.throws(() => new Steller.Game(gameObject), 'Location "location1": do not use getters for shortcut object declaration.');
+
+        gameObject = makeGame(true);
+        gameObject.locations.location1.objects = {
+            Object5: "A nice object"
+        };
+        const game = new Steller.Game(gameObject);
+        game.run();
+
+        assert.equal(game.state.main.objects.length, 4);
+        assert.equal(game.state.main.objects[3].name, 'Object5');
+        assert.equal(game.state.main.objects[3].actions.length, 1);
+        assert.equal(game.state.main.objects[3].actions[0].name, 'Examine');
+        game.state.main.objects[3].actions[0].text();
+        assert.deepEqual(game.state.out, {
+            texts:[
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'examine', type: 'command' },
+                { text: 'A nice object', type: 'normal' }
+            ]
+        });
     });
 
 

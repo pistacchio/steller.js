@@ -4,6 +4,8 @@ get:get})},{32:32,39:39,49:49,7:7,70:70,74:74}],208:[function(t,n,r){var e=t(32)
 var i=this.tryEntries[r],o=i.completion;if("root"===i.tryLoc)return handle("end");if(i.tryLoc<=this.prev){var u=e.call(i,"catchLoc"),c=e.call(i,"finallyLoc");if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.finallyLoc)return handle(i.finallyLoc)}else if(u){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0)}else{if(!c)throw new Error("try statement without catch or finally");if(this.prev<i.finallyLoc)return handle(i.finallyLoc)}}}},abrupt:function(t,n){for(var r=this.tryEntries.length-1;r>=0;--r){var i=this.tryEntries[r];if(i.tryLoc<=this.prev&&e.call(i,"finallyLoc")&&this.prev<i.finallyLoc){var o=i;break}}o&&("break"===t||"continue"===t)&&o.tryLoc<=n&&n<=o.finallyLoc&&(o=null);var u=o?o.completion:{};return u.type=t,u.arg=n,o?this.next=o.finallyLoc:this.complete(u),v},complete:function(t,n){if("throw"===t.type)throw t.arg;"break"===t.type||"continue"===t.type?this.next=t.arg:"return"===t.type?(this.rval=t.arg,this.next="end"):"normal"===t.type&&n&&(this.next=n)},finish:function(t){for(var n=this.tryEntries.length-1;n>=0;--n){var r=this.tryEntries[n];if(r.finallyLoc===t)return this.complete(r.completion,r.afterLoc),resetTryEntry(r),v}},"catch":function(t){for(var n=this.tryEntries.length-1;n>=0;--n){var r=this.tryEntries[n];if(r.tryLoc===t){var e=r.completion;if("throw"===e.type){var i=e.arg;resetTryEntry(r)}return i}}throw new Error("illegal catch attempt")},delegateYield:function(t,n,r){return this.delegate={iterator:values(t),resultName:n,nextLoc:r},v}}}("object"==typeof t?t:"object"==typeof window?window:"object"==typeof self?self:this)}).call(this,"undefined"!=typeof global?global:"undefined"!=typeof self?self:"undefined"!=typeof window?window:{})},{}]},{},[1]);
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /* istanbul ignore next */
@@ -80,8 +82,20 @@ var Steller = {
                 }
 
                 for (var object in location.objects) {
-                    location.objects[object].location = name;
-                    _this.objects[object] = location.objects[object];
+                    if (Object.getOwnPropertyDescriptor(location.objects, object).get !== undefined) {
+                        throw 'Location "' + name + '": do not use getters for shortcut object declaration.';
+                    }
+
+                    if (_.isString(location.objects[object])) {
+                        _this.objects[object] = {
+                            name: object,
+                            location: name,
+                            actions: _defineProperty({}, _this.texts.EXAMINE, location.objects[object])
+                        };
+                    } else {
+                        location.objects[object].location = name;
+                        _this.objects[object] = location.objects[object];
+                    }
                 }
 
                 return location;
@@ -517,6 +531,7 @@ var Steller = {
             RESTORE: 'restore',
             SAVED: 'Saved',
             RESTORED: 'Restored',
+            EXAMINE: 'Examine',
 
             properties: {},
             ui: {}
@@ -526,6 +541,7 @@ var Steller = {
             RESTORE: 'ricarica',
             SAVED: 'Salvato',
             RESTORED: 'Ricaricato',
+            EXAMINE: 'Esamina',
 
             properties: {},
 

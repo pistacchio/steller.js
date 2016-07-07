@@ -68,8 +68,22 @@ const Steller = {
                 }
 
                 for (let object in location.objects) {
-                    location.objects[object].location = name;
-                    this.objects[object] = location.objects[object];
+                    if (Object.getOwnPropertyDescriptor(location.objects, object).get !== undefined) {
+                        throw(`Location "${name}": do not use getters for shortcut object declaration.`);
+                    }
+
+                    if (_.isString(location.objects[object])) {
+                        this.objects[object] = {
+                            name: object,
+                            location: name,
+                            actions: {
+                                [this.texts.EXAMINE]: location.objects[object]
+                            }
+                        }
+                    } else {
+                        location.objects[object].location = name;
+                        this.objects[object] = location.objects[object];
+                    }
                 }
 
                 return location;
@@ -413,6 +427,7 @@ const Steller = {
             RESTORE:  'restore',
             SAVED:    'Saved',
             RESTORED: 'Restored',
+            EXAMINE:  'Examine',
 
             properties: {},
             ui: {}
@@ -422,6 +437,7 @@ const Steller = {
             RESTORE:  'ricarica',
             SAVED:    'Salvato',
             RESTORED: 'Ricaricato',
+            EXAMINE:  'Esamina',
 
             properties: {},
 
