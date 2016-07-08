@@ -38,7 +38,7 @@ Steller.Properties = {
                     return game.texts.properties.movable.TAKEN;
                 },
                 get available () {
-                    return !game.objectInInventory(target.id);
+                    return options.available !== false && !game.objectInInventory(target.id);
                 }
             };
 
@@ -60,7 +60,7 @@ Steller.Properties = {
                     return game.texts.properties.movable.DROPPED;
                 },
                 get available () {
-                    return game.objectInInventory(target.id);
+                    return options.available !== false && game.objectInInventory(target.id);
                 }
             };
         }
@@ -137,7 +137,7 @@ Steller.Properties = {
                     return options.hasOwnProperty('usingText') ? options.usingText : game.texts.properties.usableWith.USING;
                 },
                 get available () {
-                    return game.objectInInventory(target.id);
+                    return options.available !== false && game.objectInInventory(target.id);
                 }
             }
         }
@@ -209,6 +209,9 @@ Steller.Properties = {
                   }
 
                   return options.hasOwnProperty('talkingText') ? options.talkingText : game.texts.properties.talkable.TALKING;
+              },
+              get available () {
+                  return options.available !== false;
               }
           }
       }
