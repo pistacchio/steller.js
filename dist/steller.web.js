@@ -813,24 +813,25 @@ Steller.Properties = {
 
     changeableState: {
         apply: function apply(target, options, game) {
-            target.vars.state = options.initialState || 0;
+            var stateName = options.stateName || 'state';
+            target.vars[stateName] = options.initialState || 0;
 
             var _loop3 = function _loop3(i) {
                 var state = options.states[i];
                 target.actions[state.name] = {
                     get command() {
-                        return state.command || options.command;
+                        return state.command || options.command || state.name.toLowerCase();
                     },
                     get text() {
                         var newState = i + 1 < options.states.length ? i + 1 : 0;
                         if ('beforeStateChange' in options) {
                             newState = options.beforeStateChange(newState, i) || newState;
                         }
-                        target.vars.state = newState;
-                        return options.states[newState].text || options.text;
+                        target.vars[stateName] = newState;
+                        return state.text || options.text;
                     },
                     get available() {
-                        return options.available !== false && target.vars.state === i;
+                        return options.available !== false && target.vars[stateName] === i;
                     }
                 };
             };

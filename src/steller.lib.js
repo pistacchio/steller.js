@@ -226,7 +226,7 @@ Steller.Properties = {
                 let state = options.states[i];
                 target.actions[state.name] = {
                     get command () {
-                        return state.command || options.command;
+                        return state.command || options.command || state.name.toLowerCase();
                     },
                     get text () {
                         let newState = i + 1 < options.states.length ? i + 1 : 0;
@@ -234,7 +234,7 @@ Steller.Properties = {
                             newState = options.beforeStateChange(newState, i) || newState;
                         }
                         target.vars[stateName] = newState;
-                        return options.states[newState].text || options.text;
+                        return state.text || options.text;
                     },
                     get available () {
                         return options.available !== false && target.vars[stateName] === i;

@@ -329,11 +329,11 @@ describe('Steller standard library', function() {
                         {
                             name: 'State 1',
                             command: 'change state',
-                            text: 'changed to state 1'
+                            text: 'changed to state 2'
                         },
                         {
                             name: 'State 2',
-                            text: 'changed to state 2'
+                            text: 'changed to state 3'
                         },
                         {
                             name: 'State 3',
@@ -377,7 +377,7 @@ describe('Steller standard library', function() {
                 { text: 'changed to state 2', type: 'normal' },
                 { text: 'generic command', type: 'command' },
                 { text: 'about to change state...', type: 'normal' },
-                { text: 'generic text', type: 'normal' }
+                { text: 'changed to state 3', type: 'normal' }
             ]
         });
         assert.equal(game.state.main.objects[3].actions[0].name, 'State 3');
@@ -391,10 +391,10 @@ describe('Steller standard library', function() {
                 { text: 'changed to state 2', type: 'normal' },
                 { text: 'generic command', type: 'command' },
                 { text: 'about to change state...', type: 'normal' },
-                { text: 'generic text', type: 'normal' },
+                { text: 'changed to state 3', type: 'normal' },
                 { text: 'change state', type: 'command' },
                 { text: 'about to change state...', type: 'normal' },
-                { text: 'changed to state 1', type: 'normal' }
+                { text: 'generic text', type: 'normal' }
             ]
         });
         assert.equal(game.state.main.objects[3].actions[0].name, 'State 1');
