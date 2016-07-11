@@ -116,7 +116,8 @@ var Steller = {
                     location: null,
                     actions: {},
                     vars: {},
-                    properties: {}
+                    properties: {},
+                    available: true
                 });
 
                 for (var _property2 in object.properties) {
@@ -265,6 +266,7 @@ var Steller = {
                 var objects = this.objectsInLocation();
                 var outputObjects = [];
                 for (var object in objects) {
+                    if (!objects[object].available) continue;
                     outputObjects.push(this.prepareObject(objects[object]));
                 }
 

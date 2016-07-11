@@ -105,6 +105,7 @@ const Steller = {
                     actions:    {},
                     vars:       {},
                     properties: {},
+                    available:  true
                 });
 
                 for (let property in object.properties) {
@@ -205,6 +206,7 @@ const Steller = {
             const objects = this.objectsInLocation();
             const outputObjects = [];
             for (let object in objects) {
+                if (!objects[object].available) continue;
                 outputObjects.push(this.prepareObject(objects[object]));
             }
 

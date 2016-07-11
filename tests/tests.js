@@ -55,7 +55,6 @@ function makeGame (onlyObject=false) {
                         afterText () {
                             game.print('after text');
                         },
-                        command: 'examining',
                         text: 'examined'
                     },
                     'Read': {
@@ -181,6 +180,16 @@ describe('Steller game', function() {
         assert.equal(game.state.main.actions.length, 5);
         assert.equal(game.state.main.actions[0].name, 'Wait');
 
+    });
+
+    it('should implement objects availability', () => {
+        const game = makeGame();
+        game.run();
+
+        assert.equal(game.state.main.objects.length, 3);
+        game.objects.object1.available = false;
+        game.refreshState();
+        assert.equal(game.state.main.objects.length, 2);
     });
 
     it('should merge characters into objects', () => {
@@ -445,7 +454,7 @@ describe('Steller game', function() {
             texts:[
                 { text: 'Here the adventure begins', type: 'normal' },
                 { text: 'before text', type: 'normal' },
-                { text: 'examining', type: 'command' },
+                { text: 'examine', type: 'command' },
                 { text: 'examined', type: 'normal' },
                 { text: 'after text', type: 'normal' },
             ]
@@ -496,7 +505,7 @@ describe('Steller game', function() {
                     texts: [
                         { text: 'Here the adventure begins', type: 'normal' },
                         { text: 'before text', type: 'normal' },
-                        { text: 'examining', type: 'command' },
+                        { text: 'examine', type: 'command' },
                         { text: 'examined', type: 'normal' },
                         { text: 'after text', type: 'normal' },
                         { text: 'north', type: 'command' },
@@ -525,7 +534,7 @@ describe('Steller game', function() {
         assert.equal(game.score, 42);
         assert.equal(game._currentLocation, 'location2');
 
-        assert.equal(game.save(true), '{"locationVars":{"location1":{"var1":1},"location2":{}},"objectVars":{"object1":{"var2":2},"object2":{},"object3":{},"character1":{}},"objectLocations":{"object1":"location1","object2":"location1","object3":"location1","character1":null},"vars":{"var3":3},"currentLocation":"location2","score":42,"state":{"out":{"texts":[{"text":"Here the adventure begins","type":"normal"},{"text":"before text","type":"normal"},{"text":"examining","type":"command"},{"text":"examined","type":"normal"},{"text":"after text","type":"normal"},{"text":"north","type":"command"},{"text":42,"type":"score"},{"text":"save","type":"command"},{"text":"Restored","type":"normal"},{"text":"save","type":"command"}]}}}');
+        assert.equal(game.save(true), '{"locationVars":{"location1":{"var1":1},"location2":{}},"objectVars":{"object1":{"var2":2},"object2":{},"object3":{},"character1":{}},"objectLocations":{"object1":"location1","object2":"location1","object3":"location1","character1":null},"vars":{"var3":3},"currentLocation":"location2","score":42,"state":{"out":{"texts":[{"text":"Here the adventure begins","type":"normal"},{"text":"before text","type":"normal"},{"text":"examine","type":"command"},{"text":"examined","type":"normal"},{"text":"after text","type":"normal"},{"text":"north","type":"command"},{"text":42,"type":"score"},{"text":"save","type":"command"},{"text":"Restored","type":"normal"},{"text":"save","type":"command"}]}}}');
 
         game = makeGame();
         game.run();
