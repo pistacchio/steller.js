@@ -219,7 +219,8 @@ Steller.Properties = {
 
     changeableState: {
         apply (target, options, game) {
-            target.vars.state = options.initialState || 0;
+            let stateName = options.stateName || 'state';
+            target.vars[stateName] = options.initialState || 0;
 
             for (let i = 0; i < options.states.length; i++) {
                 let state = options.states[i];
@@ -232,11 +233,11 @@ Steller.Properties = {
                         if ('beforeStateChange' in options) {
                             newState = options.beforeStateChange(newState, i) || newState;
                         }
-                        target.vars.state = newState;
+                        target.vars[stateName] = newState;
                         return options.states[newState].text || options.text;
                     },
                     get available () {
-                        return options.available !== false && target.vars.state === i;
+                        return options.available !== false && target.vars[stateName] === i;
                     }
                 };
             }
