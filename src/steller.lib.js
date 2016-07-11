@@ -185,6 +185,7 @@ Steller.Properties = {
 
                                 game.printCommand(command);
                                 game.print(options.topics[topic].text, 'dialogue');
+                                if ('afterText' in options.topics[topic]) options.topics[topic].afterText();
                             }
                         })
                     }

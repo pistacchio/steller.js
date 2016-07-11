@@ -31,7 +31,10 @@ function makeGame (onlyObject=false) {
                     talkable: {
                         topics: {
                             'Weather': {
-                                text: 'Wow, il rains!'
+                                text: 'Wow, il rains!',
+                                afterText: () => {
+                                    game.print('and it rains hard!');
+                                }
                             }
                         }
                     }
@@ -243,7 +246,8 @@ describe('Steller standard library', function() {
                 { text: 'talk', type: 'command' },
                 { text: 'talking', type: 'normal' },
                 { text: 'talk about Weather', type: 'command' },
-                { text: 'Wow, il rains!', type: 'dialogue' }
+                { text: 'Wow, il rains!', type: 'dialogue' },
+                { text: 'and it rains hard!', type: 'normal' }
             ]
         });
         assert.isTrue(game.state.locked);
@@ -261,6 +265,7 @@ describe('Steller standard library', function() {
                 { text: 'talking', type: 'normal' },
                 { text: 'talk about Weather', type: 'command' },
                 { text: 'Wow, il rains!', type: 'dialogue' },
+                { text: 'and it rains hard!', type: 'normal' },
                 { text: 'end conversation', type: 'command' }
             ]
         });
@@ -304,6 +309,7 @@ describe('Steller standard library', function() {
                 { text: '... talking softly ...', type: 'normal' },
                 { text: 'you ask about the weather', type: 'command' },
                 { text: 'Wow, il rains!', type: 'dialogue' },
+                { text: 'and it rains hard!', type: 'normal' },
                 { text: 'suddenly ed the conversation', type: 'command' },
                 { text: 'You are tired of talking. Bye!', type: 'normal' }
             ]
