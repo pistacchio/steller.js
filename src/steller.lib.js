@@ -165,6 +165,11 @@ Steller.Properties = {
             }
         },
         apply (target, options, game) {
+            game.forceStopDialogue = () => {
+                game.unlockInteraction();
+                game.state.action = {};
+            };
+
             target.actions[game.texts.properties.talkable.TALK] = {
                 get command () {
                     if ('objectName' in options) {
@@ -197,8 +202,7 @@ Steller.Properties = {
 
                             game.printCommand(command);
                             if ('doneText' in options) game.print(options.doneText);
-                            game.unlockInteraction();
-                            game.state.action = {};
+                            game.forceStopDialogue();
                         }
                     });
 

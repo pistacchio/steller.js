@@ -264,6 +264,19 @@ describe('Steller game', function() {
         assert.equal(_.keys(game.objectsInInventory()).length, 1);
     });
 
+    it('should allow resetting action', () => {
+        const game = makeGame();
+        game.run();
+
+        game.state.action = {
+            title: 'Title',
+        }
+
+        assert.deepEqual(game.state.action, {title: 'Title'});
+        game.resetAction();
+        assert.deepEqual(game.state.action, {});
+    });
+
     it('should allow global actions', () => {
         const game = makeGame();
         game.run();

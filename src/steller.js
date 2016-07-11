@@ -17,7 +17,9 @@ const Steller = {
             this.properties        = _.get(options, 'properties', {});
             this.everyturn         = _.get(options, 'everyturn', () => {});
             this.texts             = Steller.Lang[this.lang];
-            this.formatters        = _.get(options, 'formatters', {});;
+            this.formatters        = _.get(options, 'formatters', {});
+
+            this.characters        = this.objects;
 
             this.state = {
                 header:    {
@@ -342,6 +344,11 @@ const Steller = {
         refreshState () {
             this.describeCurrentLocation();
             this.updateInventory();
+        }
+
+        resetAction () {
+            this.state.action = {};
+            this.refreshState();
         }
 
         setScore (value) {

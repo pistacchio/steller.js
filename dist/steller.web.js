@@ -31,7 +31,9 @@ var Steller = {
             this.properties = _.get(options, 'properties', {});
             this.everyturn = _.get(options, 'everyturn', function () {});
             this.texts = Steller.Lang[this.lang];
-            this.formatters = _.get(options, 'formatters', {});;
+            this.formatters = _.get(options, 'formatters', {});
+
+            this.characters = this.objects;
 
             this.state = {
                 header: {
@@ -414,8 +416,8 @@ var Steller = {
                 this.refreshState();
             }
         }, {
-            key: 'moveCharacterInLocation',
-            value: function moveCharacterInLocation(charactertName, locationName) {
+            key: 'moveCharacterToLocation',
+            value: function moveCharacterToLocation(charactertName, locationName) {
                 return this.moveObjectToLocation(charactertName, locationName);
             }
         }, {
@@ -428,6 +430,12 @@ var Steller = {
             value: function refreshState() {
                 this.describeCurrentLocation();
                 this.updateInventory();
+            }
+        }, {
+            key: 'resetAction',
+            value: function resetAction() {
+                this.state.action = {};
+                this.refreshState();
             }
         }, {
             key: 'setScore',
@@ -752,6 +760,11 @@ Steller.Properties = {
             }
         },
         apply: function apply(target, options, game) {
+            game.forceStopDialogue = function () {
+                game.unlockInteraction();
+                game.state.action = {};
+            };
+
             target.actions[game.texts.properties.talkable.TALK] = {
                 get command() {
                     if ('objectName' in options) {
@@ -791,8 +804,7 @@ Steller.Properties = {
 
                             game.printCommand(command);
                             if ('doneText' in options) game.print(options.doneText);
-                            game.unlockInteraction();
-                            game.state.action = {};
+                            game.forceStopDialogue();
                         }
                     });
 
