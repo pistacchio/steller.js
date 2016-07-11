@@ -82,7 +82,7 @@ const Steller = {
                     if (_.isString(location.objects[object])) {
                         this.objects[Steller.utils.guid('object')] = {
                             name: object,
-                            location: name,
+                            location: location.objects[object].location || name,
                             actions: {
                                 [this.texts.EXAMINE]: location.objects[object]
                             }
