@@ -144,7 +144,6 @@ const Steller = {
             };
 
             this.print(this.initialText);
-            this.refreshState();
         }
 
         describeCurrentLocation () {
@@ -244,6 +243,7 @@ const Steller = {
                             self.printCommand(action.command);
                             self.print(action.text);
                             if (action.hasOwnProperty('afterText')) action.afterText();
+                            this.refreshState();
                         }
                     };
                 });
@@ -262,12 +262,14 @@ const Steller = {
                     text: text,
                     type: type || 'normal'
                 }])
-            }
+            };
+            this.refreshState();
         }
 
         printCommand (text) {
             this.print(text, 'command');
             this.everyturn();
+            this.refreshState();
         }
 
         printScore () {
@@ -404,7 +406,6 @@ const Steller = {
             this.score = data.score;
             this.state.out.texts = data.state.out.texts;
             this.state.locked = false;
-            this.refreshState();
             this.print(this.texts.RESTORED);
         }
     },

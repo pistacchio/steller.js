@@ -309,4 +309,89 @@ describe('Steller standard library', function() {
             ]
         });
     });
+
+    it('should handle changeableState objects', () => {
+        const gameObject = makeGame(true);
+        gameObject.objects.objects4 = {
+            name: 'Object 4',
+            location: 'location1',
+            properties: {
+                changeableState: {
+                    text: 'generic text',
+                    command: 'generic command',
+                    states: [
+                        {
+                            name: 'State 1',
+                            command: 'change state',
+                            text: 'changed to state 1'
+                        },
+                        {
+                            name: 'State 2',
+                            text: 'changed to state 2'
+                        },
+                        {
+                            name: 'State 3',
+                            command: 'change state',
+                        }
+                    ],
+                    beforeStateChange: (newState, oldState) => {
+                        game.print('about to change state...');
+                    }
+                }
+            }
+        };
+        const game = new Steller.Game(gameObject);
+        game.run();
+
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: '', type: 'normal' }
+            ]
+        });
+        assert.equal(game.state.main.objects[3].actions.length, 1);
+        assert.equal(game.state.main.objects[3].actions[0].name, 'State 1');
+
+        game.state.main.objects[3].actions[0].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: '', type: 'normal' },
+                { text: 'change state', type: 'command' },
+                { text: 'about to change state...', type: 'normal' },
+                { text: 'changed to state 2', type: 'normal' }
+            ]
+        });
+        assert.equal(game.state.main.objects[3].actions[0].name, 'State 2');
+
+        game.state.main.objects[3].actions[0].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: '', type: 'normal' },
+                { text: 'change state', type: 'command' },
+                { text: 'about to change state...', type: 'normal' },
+                { text: 'changed to state 2', type: 'normal' },
+                { text: 'generic command', type: 'command' },
+                { text: 'about to change state...', type: 'normal' },
+                { text: 'generic text', type: 'normal' }
+            ]
+        });
+        assert.equal(game.state.main.objects[3].actions[0].name, 'State 3');
+
+        game.state.main.objects[3].actions[0].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: '', type: 'normal' },
+                { text: 'change state', type: 'command' },
+                { text: 'about to change state...', type: 'normal' },
+                { text: 'changed to state 2', type: 'normal' },
+                { text: 'generic command', type: 'command' },
+                { text: 'about to change state...', type: 'normal' },
+                { text: 'generic text', type: 'normal' },
+                { text: 'change state', type: 'command' },
+                { text: 'about to change state...', type: 'normal' },
+                { text: 'changed to state 1', type: 'normal' }
+            ]
+        });
+        assert.equal(game.state.main.objects[3].actions[0].name, 'State 1');
+    });
+
 });

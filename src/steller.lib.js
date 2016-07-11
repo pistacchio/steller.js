@@ -162,58 +162,83 @@ Steller.Properties = {
                 DONE: 'Fatto',
                 END: 'termina conversazione',
                 TALKING: 'parlando...',
-
             }
         },
         apply (target, options, game) {
             target.actions[game.texts.properties.talkable.TALK] = {
-              get command () {
-                  if (options.hasOwnProperty('objectName')) {
-                      return Steller.utils.formatText(game.texts.properties.talkable.TALK_TO, options.objectName);
-                  } else {
-                      return game.texts.properties.talkable.TALK.toLowerCase();
-                  }
-              },
-              get text () {
-                  const self = this;
-                  let actions = [];
-                  for (let topic in options.topics) {
-                      if (options.topics[topic].hasOwnProperty('available') && !options.topics[topic].available) continue;
-                      actions.push({
-                          name: topic,
-                          text () {
-                              let command = options.topics[topic].hasOwnProperty('command') ? options.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
+                get command () {
+                    if (options.hasOwnProperty('objectName')) {
+                        return Steller.utils.formatText(game.texts.properties.talkable.TALK_TO, options.objectName);
+                    } else {
+                        return game.texts.properties.talkable.TALK.toLowerCase();
+                    }
+                },
+                get text () {
+                    const self = this;
+                    let actions = [];
+                    for (let topic in options.topics) {
+                        if (options.topics[topic].hasOwnProperty('available') && !options.topics[topic].available) continue;
+                        actions.push({
+                            name: topic,
+                            text () {
+                                let command = options.topics[topic].hasOwnProperty('command') ? options.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
 
-                              game.printCommand(command);
-                              game.print(options.topics[topic].text, 'dialogue');
-                          }
-                      })
-                  }
+                                game.printCommand(command);
+                                game.print(options.topics[topic].text, 'dialogue');
+                            }
+                        })
+                    }
 
-                  actions.push({
-                      name: options.hasOwnProperty('doneName') ? options.doneName : game.texts.properties.talkable.DONE,
-                      text () {
-                          let command = options.hasOwnProperty('doneCommand') ? options.doneCommand : game.texts.properties.talkable.END;
+                    actions.push({
+                        name: options.hasOwnProperty('doneName') ? options.doneName : game.texts.properties.talkable.DONE,
+                        text () {
+                            let command = options.hasOwnProperty('doneCommand') ? options.doneCommand : game.texts.properties.talkable.END;
 
-                          game.printCommand(command);
-                          if (options.hasOwnProperty('doneText')) game.print(options.doneText);
-                          game.unlockInteraction();
-                          game.state.action = {};
-                      }
-                  })
+                            game.printCommand(command);
+                            if (options.hasOwnProperty('doneText')) game.print(options.doneText);
+                            game.unlockInteraction();
+                            game.state.action = {};
+                        }
+                    });
 
-                  game.lockInteraction();
-                  game.state.action = {
-                      title: options.hasOwnProperty('title') ? options.title : game.texts.properties.talkable.TALK_ABOUT,
-                      actions: actions
-                  }
+                    game.lockInteraction();
+                    game.state.action = {
+                        title: options.hasOwnProperty('title') ? options.title : game.texts.properties.talkable.TALK_ABOUT,
+                        actions: actions
+                    };
 
-                  return options.hasOwnProperty('talkingText') ? options.talkingText : game.texts.properties.talkable.TALKING;
-              },
-              get available () {
-                  return options.available !== false;
-              }
-          }
-      }
-  }
+                    return options.hasOwnProperty('talkingText') ? options.talkingText : game.texts.properties.talkable.TALKING;
+                },
+                get available () {
+                    return options.available !== false;
+                }
+            }
+        }
+    },
+
+    changeableState: {
+        apply (target, options, game) {
+            target.vars.state = options.initialState || 0;
+
+            for (let i = 0; i < options.states.length; i++) {
+                let state = options.states[i];
+                target.actions[state.name] = {
+                    get command () {
+                        return state.command || options.command;
+                    },
+                    get text () {
+                        let newState = i + 1 < options.states.length ? i + 1 : 0;
+                        if ('beforeStateChange' in options) {
+                            newState = options.beforeStateChange(newState, i) || newState;
+                        }
+                        target.vars.state = newState;
+                        return options.states[newState].text || options.text;
+                    },
+                    get available () {
+                        return options.available !== false && target.vars.state === i;
+                    }
+                };
+            }
+        }
+    }
 };
