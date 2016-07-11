@@ -59,7 +59,7 @@ var Steller = {
 
             // extend lang for properties
             for (var property in this.properties) {
-                if (this.properties[property].hasOwnProperty('lang')) {
+                if ('lang' in this.properties[property]) {
                     this.texts.properties[property] = this.properties[property].lang[this.lang];
                 }
             }
@@ -178,7 +178,6 @@ var Steller = {
                 };
 
                 this.print(this.initialText);
-                this.refreshState();
             }
         }, {
             key: 'describeCurrentLocation',
@@ -241,7 +240,7 @@ var Steller = {
                     };
 
                     if (_.isObject(exits[exit])) {
-                        if (exits[exit].hasOwnProperty('direction')) {
+                        if ('direction' in exits[exit]) {
                             Object.defineProperty(exits[exit], 'text', Object.getOwnPropertyDescriptor(exits[exit], 'direction'));
                         }
                         ex = Steller.utils.lightMerge(exits[exit], ex);
@@ -280,6 +279,8 @@ var Steller = {
         }, {
             key: 'prepareObject',
             value: function prepareObject(obj) {
+                var _this3 = this;
+
                 var actions = [];
                 var self = this;
 
@@ -304,10 +305,11 @@ var Steller = {
                         return {
                             name: actionName,
                             text: function text() {
-                                if (action.hasOwnProperty('beforeText')) action.beforeText();
+                                if ('beforeText' in action) action.beforeText();
                                 self.printCommand(action.command);
                                 self.print(action.text);
-                                if (action.hasOwnProperty('afterText')) action.afterText();
+                                if ('afterText' in action) action.afterText();
+                                _this3.refreshState();
                             }
                         };
                     });
@@ -327,12 +329,14 @@ var Steller = {
                         type: type || 'normal'
                     }])
                 };
+                this.refreshState();
             }
         }, {
             key: 'printCommand',
             value: function printCommand(text) {
                 this.print(text, 'command');
                 this.everyturn();
+                this.refreshState();
             }
         }, {
             key: 'printScore',
@@ -344,10 +348,10 @@ var Steller = {
             value: function gotoLocation(location, command) {
                 if (command !== undefined) this.printCommand(command);
 
-                if (this.locations.hasOwnProperty(location)) {
-                    if (this.currentLocation.hasOwnProperty('onExit')) this.currentLocation.onExit();
+                if (location in this.locations) {
+                    if ('onExit' in this.currentLocation) this.currentLocation.onExit();
                     this.currentLocation = location;
-                    if (this.currentLocation.hasOwnProperty('onEnter')) this.currentLocation.onEnter();
+                    if ('onEnter' in this.currentLocation) this.currentLocation.onEnter();
                     this.refreshState();
                 } else {
                     this.print(location);
@@ -366,11 +370,11 @@ var Steller = {
         }, {
             key: 'updateInventory',
             value: function updateInventory() {
-                var _this3 = this;
+                var _this4 = this;
 
                 this.state.inventory = {
                     objects: _.map(this.objectsInInventory(), function (o) {
-                        return _this3.prepareObject(o);
+                        return _this4.prepareObject(o);
                     })
                 };
             }
@@ -494,7 +498,6 @@ var Steller = {
                 this.score = data.score;
                 this.state.out.texts = data.state.out.texts;
                 this.state.locked = false;
-                this.refreshState();
                 this.print(this.texts.RESTORED);
             }
         }, {
@@ -513,7 +516,7 @@ var Steller = {
     utils: {
         lightMerge: function lightMerge(obj, source) {
             for (var prop in source) {
-                if (!obj.hasOwnProperty(prop)) {
+                if (!(prop in obj)) {
                     Object.defineProperty(obj, prop, Object.getOwnPropertyDescriptor(source, prop));
                 }
             }
@@ -588,17 +591,17 @@ Steller.Properties = {
         apply: function apply(target, options, game) {
             target.actions[game.texts.properties.movable.TAKE] = {
                 get command() {
-                    if (options.hasOwnProperty('takeCommand')) {
+                    if ('takeCommand' in options) {
                         return options.takeCommand;
                     }
-                    if (options.hasOwnProperty('objectName')) {
+                    if ('objectName' in options) {
                         return game.texts.properties.movable.TAKE.toLowerCase() + ' ' + options.objectName;
                     }
                     return game.texts.properties.movable.TAKE.toLowerCase();
                 },
                 get text() {
                     game.moveObjectToInventory(target.id);
-                    if (options.hasOwnProperty('takeText')) {
+                    if ('takeText' in options) {
                         return options.takeText;
                     }
                     return game.texts.properties.movable.TAKEN;
@@ -610,17 +613,17 @@ Steller.Properties = {
 
             target.actions[game.texts.properties.movable.DROP] = {
                 get command() {
-                    if (options.hasOwnProperty('dropCommand')) {
+                    if ('dropCommand' in options) {
                         return options.dropCommand;
                     }
-                    if (options.hasOwnProperty('objectName')) {
+                    if ('objectName' in options) {
                         return game.texts.properties.movable.DROP.toLowerCase() + ' ' + options.objectName;
                     }
                     return game.texts.properties.movable.DROP.toLowerCase();
                 },
                 get text() {
                     game.moveObjectToLocation(target.id);
-                    if (options.hasOwnProperty('dropText')) {
+                    if ('dropText' in options) {
                         return options.dropText;
                     }
                     return game.texts.properties.movable.DROPPED;
@@ -654,11 +657,11 @@ Steller.Properties = {
         apply: function apply(target, options, game) {
             target.actions[game.texts.properties.usableWith.USE_WITH] = {
                 get command() {
-                    if (options.hasOwnProperty('command')) {
+                    if ('command' in options) {
                         return options.command;
                     }
 
-                    if (options.hasOwnProperty('objectName')) {
+                    if ('objectName' in options) {
                         return Steller.utils.formatText(game.texts.properties.usableWith.USE_WITH, options.objectName);
                     } else {
                         return game.texts.properties.usableWith.USE;
@@ -672,7 +675,7 @@ Steller.Properties = {
                         return o.id !== target.id;
                     });
 
-                    var interactions = options.hasOwnProperty('interactions') ? options.interactions : {};
+                    var interactions = 'interactions' in options ? options.interactions : {};
 
                     var _loop = function _loop(object) {
                         actions.push({
@@ -682,11 +685,11 @@ Steller.Properties = {
 
                                 var text = game.texts.properties.usableWith.NOTHING;
 
-                                if (interactions.hasOwnProperty(object)) {
-                                    if (interactions[object].hasOwnProperty('command')) command = interactions[object].command;
-                                    if (interactions[object].hasOwnProperty('text')) text = interactions[object].text;
+                                if (object in interactions) {
+                                    if ('command' in interactions[object]) command = interactions[object].command;
+                                    if ('text' in interactions[object]) text = interactions[object].text;
                                 } else {
-                                    if (interactions.hasOwnProperty('default')) text = interactions.default;
+                                    if ('default' in interactions) text = interactions.default;
                                 }
 
                                 game.printCommand(command);
@@ -703,10 +706,10 @@ Steller.Properties = {
 
                     game.lockInteraction();
                     game.state.action = {
-                        title: options.hasOwnProperty('title') ? options.title : game.texts.properties.usableWith.USE_WITH,
+                        title: 'title' in options ? options.title : game.texts.properties.usableWith.USE_WITH,
                         actions: actions
                     };
-                    return options.hasOwnProperty('usingText') ? options.usingText : game.texts.properties.usableWith.USING;
+                    return 'usingText' in options ? options.usingText : game.texts.properties.usableWith.USING;
                 },
                 get available() {
                     return options.available !== false && game.objectInInventory(target.id);
@@ -734,13 +737,12 @@ Steller.Properties = {
                 DONE: 'Fatto',
                 END: 'termina conversazione',
                 TALKING: 'parlando...'
-
             }
         },
         apply: function apply(target, options, game) {
             target.actions[game.texts.properties.talkable.TALK] = {
                 get command() {
-                    if (options.hasOwnProperty('objectName')) {
+                    if ('objectName' in options) {
                         return Steller.utils.formatText(game.texts.properties.talkable.TALK_TO, options.objectName);
                     } else {
                         return game.texts.properties.talkable.TALK.toLowerCase();
@@ -751,11 +753,11 @@ Steller.Properties = {
                     var actions = [];
 
                     var _loop2 = function _loop2(topic) {
-                        if (options.topics[topic].hasOwnProperty('available') && !options.topics[topic].available) return 'continue';
+                        if ('available' in options.topics[topic] && !options.topics[topic].available) return 'continue';
                         actions.push({
                             name: topic,
                             text: function text() {
-                                var command = options.topics[topic].hasOwnProperty('command') ? options.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
+                                var command = 'command' in options.topics[topic] ? options.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
 
                                 game.printCommand(command);
                                 game.print(options.topics[topic].text, 'dialogue');
@@ -770,12 +772,12 @@ Steller.Properties = {
                     }
 
                     actions.push({
-                        name: options.hasOwnProperty('doneName') ? options.doneName : game.texts.properties.talkable.DONE,
+                        name: 'doneName' in options ? options.doneName : game.texts.properties.talkable.DONE,
                         text: function text() {
-                            var command = options.hasOwnProperty('doneCommand') ? options.doneCommand : game.texts.properties.talkable.END;
+                            var command = 'doneCommand' in options ? options.doneCommand : game.texts.properties.talkable.END;
 
                             game.printCommand(command);
-                            if (options.hasOwnProperty('doneText')) game.print(options.doneText);
+                            if ('doneText' in options) game.print(options.doneText);
                             game.unlockInteraction();
                             game.state.action = {};
                         }
@@ -783,16 +785,46 @@ Steller.Properties = {
 
                     game.lockInteraction();
                     game.state.action = {
-                        title: options.hasOwnProperty('title') ? options.title : game.texts.properties.talkable.TALK_ABOUT,
+                        title: 'title' in options ? options.title : game.texts.properties.talkable.TALK_ABOUT,
                         actions: actions
                     };
 
-                    return options.hasOwnProperty('talkingText') ? options.talkingText : game.texts.properties.talkable.TALKING;
+                    return 'talkingText' in options ? options.talkingText : game.texts.properties.talkable.TALKING;
                 },
                 get available() {
                     return options.available !== false;
                 }
             };
+        }
+    },
+
+    changeableState: {
+        apply: function apply(target, options, game) {
+            target.vars.state = options.initialState || 0;
+
+            var _loop3 = function _loop3(i) {
+                var state = options.states[i];
+                target.actions[state.name] = {
+                    get command() {
+                        return state.command || options.command;
+                    },
+                    get text() {
+                        var newState = i + 1 < options.states.length ? i + 1 : 0;
+                        if ('beforeStateChange' in options) {
+                            newState = options.beforeStateChange(newState, i) || newState;
+                        }
+                        target.vars.state = newState;
+                        return options.states[newState].text || options.text;
+                    },
+                    get available() {
+                        return options.available !== false && target.vars.state === i;
+                    }
+                };
+            };
+
+            for (var i = 0; i < options.states.length; i++) {
+                _loop3(i);
+            }
         }
     }
 };
@@ -964,7 +996,7 @@ Steller.Web = {
                             var text = _step3.value;
 
                             // console.log(text.type);
-                            if (_this.formatters.hasOwnProperty(text.type)) {
+                            if (text.type in _this.formatters) {
                                 $output.append(Steller.utils.formatText(_this.formatters[text.type], text.text));
                             } else {
                                 switch (text.type) {
@@ -995,7 +1027,7 @@ Steller.Web = {
                         }
                     }
 
-                    $output.scrollTop(Number.MAX_SAFE_INTEGER);
+                    $output.scrollTop($output.get(0).scrollHeight);
                 }
             });
 

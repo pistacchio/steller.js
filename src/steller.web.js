@@ -236,7 +236,7 @@ Steller.Web = {
                         }
                     }
 
-                    $output.scrollTop(Number.MAX_SAFE_INTEGER);
+                    $output.scrollTop($output.get(0).scrollHeight);
                 }
             });
 
