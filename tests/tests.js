@@ -189,6 +189,10 @@ describe('Steller game', function() {
 
         assert.isTrue(_.keys(game.objects).includes('character1'));
         assert.equal(_.keys(game.objects).length, 4);
+
+        assert.isFalse(game.characterIsInLocation('character1'));
+        game.moveCharacterInLocation('character1');
+        assert.isTrue(game.characterIsInLocation('character1'));
     });
 
     it('should allow object declaration withing locations', () => {

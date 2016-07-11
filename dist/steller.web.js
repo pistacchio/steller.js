@@ -306,7 +306,7 @@ var Steller = {
                             name: actionName,
                             text: function text() {
                                 if ('beforeText' in action) action.beforeText();
-                                self.printCommand(action.command);
+                                self.printCommand(action.command || actionName.toLowerCase());
                                 self.print(action.text);
                                 if ('afterText' in action) action.afterText();
                                 _this3.refreshState();
@@ -398,6 +398,11 @@ var Steller = {
                 return this.objects[objectName].location === locationName;
             }
         }, {
+            key: 'characterIsInLocation',
+            value: function characterIsInLocation(characterName, locationName) {
+                return this.objectIsInLocation(characterName, locationName);
+            }
+        }, {
             key: 'moveObjectToLocation',
             value: function moveObjectToLocation(objectName, locationName) {
                 if (locationName === undefined) locationName = this._currentLocation;
@@ -405,6 +410,11 @@ var Steller = {
 
                 object.location = locationName;
                 this.refreshState();
+            }
+        }, {
+            key: 'moveCharacterInLocation',
+            value: function moveCharacterInLocation(charactertName, locationName) {
+                return this.moveObjectToLocation(charactertName, locationName);
             }
         }, {
             key: 'moveObjectToInventory',
@@ -761,6 +771,7 @@ Steller.Properties = {
 
                                 game.printCommand(command);
                                 game.print(options.topics[topic].text, 'dialogue');
+                                if ('afterText' in options.topics[topic]) options.topics[topic].afterText();
                             }
                         });
                     };

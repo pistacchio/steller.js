@@ -240,7 +240,7 @@ const Steller = {
                         name: actionName,
                         text: () => {
                             if ('beforeText' in action) action.beforeText();
-                            self.printCommand(action.command);
+                            self.printCommand(action.command || actionName.toLowerCase());
                             self.print(action.text);
                             if ('afterText' in action) action.afterText();
                             this.refreshState();
@@ -317,6 +317,10 @@ const Steller = {
             return this.objects[objectName].location === locationName;
         }
 
+        characterIsInLocation (characterName, locationName) {
+            return this.objectIsInLocation(characterName, locationName);
+        }
+
         moveObjectToLocation (objectName, locationName) {
             if (locationName === undefined) locationName = this._currentLocation;
             const object = this.objects[objectName];
@@ -324,6 +328,10 @@ const Steller = {
             object.location = locationName;
             this.refreshState();
         }
+
+        moveCharacterInLocation (charactertName, locationName) {
+            return this.moveObjectToLocation(charactertName, locationName);
+        };
 
         moveObjectToInventory (objectName) {
             this.moveObjectToLocation(objectName, Steller.INVENTORY);
