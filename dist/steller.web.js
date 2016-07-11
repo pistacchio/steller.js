@@ -94,7 +94,7 @@ var Steller = {
                     }
 
                     if (_.isString(location.objects[object])) {
-                        _this.objects[object] = {
+                        _this.objects[Steller.utils.guid('object')] = {
                             name: object,
                             location: name,
                             actions: _defineProperty({}, _this.texts.EXAMINE, location.objects[object])
@@ -562,7 +562,16 @@ var Steller = {
                 str = str.split('{' + i + '}').join(rest[i]);
             }
             return str;
-        }
+        },
+        guid: function guid() {
+            var prefix = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+            Steller.utils.uniqueId += 1;
+            return prefix + (new Date().getTime() + Steller.utils.uniqueId);
+        },
+
+
+        uniqueId: 0
     },
 
     Lang: {

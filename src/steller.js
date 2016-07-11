@@ -80,7 +80,7 @@ const Steller = {
                     }
 
                     if (_.isString(location.objects[object])) {
-                        this.objects[object] = {
+                        this.objects[Steller.utils.guid('object')] = {
                             name: object,
                             location: name,
                             actions: {
@@ -453,7 +453,14 @@ const Steller = {
                 str = str.split(`{${i}}`).join(rest[i]);
             }
             return str;
-        }
+        },
+
+        guid (prefix='') {
+            Steller.utils.uniqueId += 1;
+            return prefix + (new Date().getTime() + Steller.utils.uniqueId);
+        },
+
+        uniqueId: 0
     },
 
     Lang: {
