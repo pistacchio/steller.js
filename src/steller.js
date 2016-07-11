@@ -45,7 +45,7 @@ const Steller = {
 
             // extend lang for properties
             for (let property in this.properties) {
-                if (this.properties[property].hasOwnProperty('lang')) {
+                if ('lang' in this.properties[property]) {
                     this.texts.properties[property] = this.properties[property].lang[this.lang];
                 }
             }
@@ -186,7 +186,7 @@ const Steller = {
                 };
 
                 if (_.isObject(exits[exit])) {
-                    if (exits[exit].hasOwnProperty('direction')) {
+                    if ('direction' in exits[exit]) {
                         Object.defineProperty(exits[exit], 'text', Object.getOwnPropertyDescriptor(exits[exit], 'direction'));
                     }
                     ex = Steller.utils.lightMerge(exits[exit], ex);
@@ -239,10 +239,10 @@ const Steller = {
                     return {
                         name: actionName,
                         text: () => {
-                            if (action.hasOwnProperty('beforeText')) action.beforeText();
+                            if ('beforeText' in action) action.beforeText();
                             self.printCommand(action.command);
                             self.print(action.text);
-                            if (action.hasOwnProperty('afterText')) action.afterText();
+                            if ('afterText' in action) action.afterText();
                             this.refreshState();
                         }
                     };
@@ -279,10 +279,10 @@ const Steller = {
         gotoLocation (location, command) {
             if (command !== undefined) this.printCommand(command);
 
-            if (this.locations.hasOwnProperty(location)) {
-                if (this.currentLocation.hasOwnProperty('onExit')) this.currentLocation.onExit();
+            if (location in this.locations) {
+                if ('onExit' in this.currentLocation) this.currentLocation.onExit();
                 this.currentLocation = location;
-                if (this.currentLocation.hasOwnProperty('onEnter')) this.currentLocation.onEnter();
+                if ('onEnter' in this.currentLocation) this.currentLocation.onEnter();
                 this.refreshState();
             } else {
                 this.print(location);
@@ -413,7 +413,7 @@ const Steller = {
     utils: {
         lightMerge (obj, source) {
             for (let prop in source) {
-                if (!obj.hasOwnProperty(prop)) {
+                if (!(prop in obj)) {
                     Object.defineProperty(obj, prop, Object.getOwnPropertyDescriptor(source, prop));
                 }
             }

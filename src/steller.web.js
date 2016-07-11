@@ -219,7 +219,7 @@ Steller.Web = {
                     $output.html('');
                     for (let text of val.texts) {
                         // console.log(text.type);
-                        if (this.formatters.hasOwnProperty(text.type)) {
+                        if (text.type in this.formatters) {
                             $output.append(Steller.utils.formatText(this.formatters[text.type], text.text));
                         } else {
                             switch(text.type) {

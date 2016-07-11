@@ -22,17 +22,17 @@ Steller.Properties = {
         apply (target, options, game) {
             target.actions[game.texts.properties.movable.TAKE] = {
                 get command () {
-                    if (options.hasOwnProperty('takeCommand')) {
+                    if ('takeCommand' in options) {
                         return options.takeCommand;
                     }
-                    if (options.hasOwnProperty('objectName')) {
+                    if ('objectName' in options) {
                         return `${game.texts.properties.movable.TAKE.toLowerCase()} ${options.objectName}`;
                     }
                     return game.texts.properties.movable.TAKE.toLowerCase();
                 },
                 get text () {
                     game.moveObjectToInventory(target.id);
-                    if (options.hasOwnProperty('takeText')) {
+                    if ('takeText' in options) {
                         return options.takeText;
                     }
                     return game.texts.properties.movable.TAKEN;
@@ -44,17 +44,17 @@ Steller.Properties = {
 
             target.actions[game.texts.properties.movable.DROP] = {
                 get command () {
-                    if (options.hasOwnProperty('dropCommand')) {
+                    if ('dropCommand' in options) {
                         return options.dropCommand;
                     }
-                    if (options.hasOwnProperty('objectName')) {
+                    if ('objectName' in options) {
                         return `${game.texts.properties.movable.DROP.toLowerCase()} ${options.objectName}`;
                     }
                     return game.texts.properties.movable.DROP.toLowerCase();
                 },
                 get text () {
                     game.moveObjectToLocation(target.id);
-                    if (options.hasOwnProperty('dropText')) {
+                    if ('dropText' in options) {
                         return options.dropText;
                     }
                     return game.texts.properties.movable.DROPPED;
@@ -88,11 +88,11 @@ Steller.Properties = {
         apply (target, options, game) {
             target.actions[game.texts.properties.usableWith.USE_WITH] = {
                 get command () {
-                    if (options.hasOwnProperty('command')) {
+                    if ('command' in options) {
                         return options.command;
                     }
 
-                    if (options.hasOwnProperty('objectName')) {
+                    if ('objectName' in options) {
                         return Steller.utils.formatText(game.texts.properties.usableWith.USE_WITH, options.objectName);
                     } else {
                         return game.texts.properties.usableWith.USE;
@@ -104,7 +104,7 @@ Steller.Properties = {
                     let availableObjects = Steller.utils.lightMerge(game.objectsInLocation(), game.objectsInInventory());
                     availableObjects = _.pickBy(availableObjects, o => o.id !== target.id);
 
-                    let interactions = options.hasOwnProperty('interactions') ? options.interactions : {};
+                    let interactions = 'interactions' in options ? options.interactions : {};
 
                     for (let object in availableObjects) {
                         actions.push({
@@ -114,11 +114,11 @@ Steller.Properties = {
 
                                 let text = game.texts.properties.usableWith.NOTHING;
 
-                                if (interactions.hasOwnProperty(object)) {
-                                    if (interactions[object].hasOwnProperty('command')) command = interactions[object].command;
-                                    if (interactions[object].hasOwnProperty('text')) text = interactions[object].text;
+                                if (object in interactions) {
+                                    if ('command' in interactions[object]) command = interactions[object].command;
+                                    if ('text' in interactions[object]) text = interactions[object].text;
                                 } else {
-                                    if (interactions.hasOwnProperty('default')) text = interactions.default;
+                                    if ('default' in interactions) text = interactions.default;
                                 }
 
                                 game.printCommand(command);
@@ -131,10 +131,10 @@ Steller.Properties = {
 
                     game.lockInteraction();
                     game.state.action = {
-                        title: options.hasOwnProperty('title') ? options.title : game.texts.properties.usableWith.USE_WITH,
+                        title: 'title' in options ? options.title : game.texts.properties.usableWith.USE_WITH,
                         actions: actions
                     }
-                    return options.hasOwnProperty('usingText') ? options.usingText : game.texts.properties.usableWith.USING;
+                    return 'usingText' in options ? options.usingText : game.texts.properties.usableWith.USING;
                 },
                 get available () {
                     return options.available !== false && game.objectInInventory(target.id);
@@ -167,7 +167,7 @@ Steller.Properties = {
         apply (target, options, game) {
             target.actions[game.texts.properties.talkable.TALK] = {
                 get command () {
-                    if (options.hasOwnProperty('objectName')) {
+                    if ('objectName' in options) {
                         return Steller.utils.formatText(game.texts.properties.talkable.TALK_TO, options.objectName);
                     } else {
                         return game.texts.properties.talkable.TALK.toLowerCase();
@@ -177,11 +177,11 @@ Steller.Properties = {
                     const self = this;
                     let actions = [];
                     for (let topic in options.topics) {
-                        if (options.topics[topic].hasOwnProperty('available') && !options.topics[topic].available) continue;
+                        if ('available' in options.topics[topic] && !options.topics[topic].available) continue;
                         actions.push({
                             name: topic,
                             text () {
-                                let command = options.topics[topic].hasOwnProperty('command') ? options.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
+                                let command = 'command' in options.topics[topic] ? options.topics[topic].command : Steller.utils.formatText(game.texts.properties.talkable.TALK_ABOUT_TOPIC, topic);
 
                                 game.printCommand(command);
                                 game.print(options.topics[topic].text, 'dialogue');
@@ -190,12 +190,12 @@ Steller.Properties = {
                     }
 
                     actions.push({
-                        name: options.hasOwnProperty('doneName') ? options.doneName : game.texts.properties.talkable.DONE,
+                        name: 'doneName' in options ? options.doneName : game.texts.properties.talkable.DONE,
                         text () {
-                            let command = options.hasOwnProperty('doneCommand') ? options.doneCommand : game.texts.properties.talkable.END;
+                            let command = 'doneCommand' in options ? options.doneCommand : game.texts.properties.talkable.END;
 
                             game.printCommand(command);
-                            if (options.hasOwnProperty('doneText')) game.print(options.doneText);
+                            if ('doneText' in options) game.print(options.doneText);
                             game.unlockInteraction();
                             game.state.action = {};
                         }
@@ -203,11 +203,11 @@ Steller.Properties = {
 
                     game.lockInteraction();
                     game.state.action = {
-                        title: options.hasOwnProperty('title') ? options.title : game.texts.properties.talkable.TALK_ABOUT,
+                        title: 'title' in options ? options.title : game.texts.properties.talkable.TALK_ABOUT,
                         actions: actions
                     };
 
-                    return options.hasOwnProperty('talkingText') ? options.talkingText : game.texts.properties.talkable.TALKING;
+                    return 'talkingText' in options ? options.talkingText : game.texts.properties.talkable.TALKING;
                 },
                 get available () {
                     return options.available !== false;
