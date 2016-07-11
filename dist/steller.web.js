@@ -100,7 +100,7 @@ var Steller = {
                             actions: _defineProperty({}, _this.texts.EXAMINE, location.objects[object])
                         };
                     } else {
-                        location.objects[object].location = name;
+                        location.objects[object].location = location.objects[object].location || name;
                         _this.objects[object] = location.objects[object];
                     }
                 }

@@ -82,13 +82,13 @@ const Steller = {
                     if (_.isString(location.objects[object])) {
                         this.objects[Steller.utils.guid('object')] = {
                             name: object,
-                            location: location.objects[object].location || name,
+                            location: name,
                             actions: {
                                 [this.texts.EXAMINE]: location.objects[object]
                             }
                         }
                     } else {
-                        location.objects[object].location = name;
+                        location.objects[object].location = location.objects[object].location || name;
                         this.objects[object] = location.objects[object];
                     }
                 }
