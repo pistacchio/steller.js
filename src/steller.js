@@ -331,7 +331,7 @@ const Steller = {
             this.refreshState();
         }
 
-        moveCharacterInLocation (charactertName, locationName) {
+        moveCharacterToLocation (charactertName, locationName) {
             return this.moveObjectToLocation(charactertName, locationName);
         };
 

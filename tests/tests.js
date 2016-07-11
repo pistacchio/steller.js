@@ -200,7 +200,7 @@ describe('Steller game', function() {
         assert.equal(_.keys(game.objects).length, 4);
 
         assert.isFalse(game.characterIsInLocation('character1'));
-        game.moveCharacterInLocation('character1');
+        game.moveCharacterToLocation('character1');
         assert.isTrue(game.characterIsInLocation('character1'));
     });
 
