@@ -108,7 +108,6 @@ describe('Steller standard library', function() {
         game.state.inventory.objects[0].actions[0].text();
         assert.deepEqual(game.state.out, {
             texts: [
-                { text: '', type: 'normal' },
                 { text: 'take the object', type: 'command' },
                 { text: 'Taken', type: 'normal' },
                 { text: 'take it!', type: 'command' },
@@ -185,7 +184,6 @@ describe('Steller standard library', function() {
 
         assert.deepEqual(game.state.out, {
             texts: [
-                { text: '', type: 'normal' },
                 { text: 'take the object', type: 'command' },
                 { text: 'Taken', type: 'normal' },
                 { text: 'use', type: 'command' },
@@ -224,7 +222,6 @@ describe('Steller standard library', function() {
         game.state.main.objects[0].actions[1].text();
         assert.deepEqual(game.state.out, {
             texts: [
-                { text: '', type: 'normal' },
                 { text: 'talk', type: 'command' },
                 { text: 'talking', type: 'normal' }
             ]
@@ -242,7 +239,6 @@ describe('Steller standard library', function() {
 
         assert.deepEqual(game.state.out, {
             texts: [
-                { text: '', type: 'normal' },
                 { text: 'talk', type: 'command' },
                 { text: 'talking', type: 'normal' },
                 { text: 'talk about Weather', type: 'command' },
@@ -260,7 +256,6 @@ describe('Steller standard library', function() {
         assert.notEqual(game.state.main.objects[0].actions.length, 0);
         assert.deepEqual(game.state.out, {
             texts: [
-                { text: '', type: 'normal' },
                 { text: 'talk', type: 'command' },
                 { text: 'talking', type: 'normal' },
                 { text: 'talk about Weather', type: 'command' },
@@ -346,13 +341,11 @@ describe('Steller standard library', function() {
                 }
             }
         };
-        const game = new Steller.Game(gameObject);
+        let game = new Steller.Game(gameObject);
         game.run();
 
         assert.deepEqual(game.state.out, {
-            texts: [
-                { text: '', type: 'normal' }
-            ]
+            texts: []
         });
         assert.equal(game.state.main.objects[3].actions.length, 1);
         assert.equal(game.state.main.objects[3].actions[0].name, 'State 1');
@@ -360,7 +353,6 @@ describe('Steller standard library', function() {
         game.state.main.objects[3].actions[0].text();
         assert.deepEqual(game.state.out, {
             texts: [
-                { text: '', type: 'normal' },
                 { text: 'change state', type: 'command' },
                 { text: 'about to change state...', type: 'normal' },
                 { text: 'changed to state 2', type: 'normal' }
@@ -371,7 +363,6 @@ describe('Steller standard library', function() {
         game.state.main.objects[3].actions[0].text();
         assert.deepEqual(game.state.out, {
             texts: [
-                { text: '', type: 'normal' },
                 { text: 'change state', type: 'command' },
                 { text: 'about to change state...', type: 'normal' },
                 { text: 'changed to state 2', type: 'normal' },
@@ -385,7 +376,6 @@ describe('Steller standard library', function() {
         game.state.main.objects[3].actions[0].text();
         assert.deepEqual(game.state.out, {
             texts: [
-                { text: '', type: 'normal' },
                 { text: 'change state', type: 'command' },
                 { text: 'about to change state...', type: 'normal' },
                 { text: 'changed to state 2', type: 'normal' },
@@ -398,6 +388,44 @@ describe('Steller standard library', function() {
             ]
         });
         assert.equal(game.state.main.objects[3].actions[0].name, 'State 1');
+
+        gameObject.objects.objects4 = {
+            name: 'Object 4',
+            location: 'location1',
+            properties: {
+                changeableState: {
+                    states: [
+                        {
+                            name: 'State 1',
+                        },
+                        {
+                            name: 'State 2',
+                        }
+                    ],
+                    beforeStateChange(newState, oldState) {
+                        return oldState;
+                    }
+                }
+            }
+        };
+
+        game.state.out = {};
+        game = new Steller.Game(gameObject);
+        game.run();
+
+        game.state.main.objects[3].actions[0].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'state 1', type: 'command' }
+            ]
+        });
+        game.state.main.objects[3].actions[0].text();
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'state 1', type: 'command' },
+                { text: 'state 1', type: 'command' }
+            ]
+        });
     });
 
 });

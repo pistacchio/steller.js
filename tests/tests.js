@@ -264,6 +264,36 @@ describe('Steller game', function() {
         assert.equal(_.keys(game.objectsInInventory()).length, 1);
     });
 
+    it('should ignore empty print commands', () => {
+        const game = makeGame();
+        game.run();
+
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' }
+            ]
+        });
+        game.print('actual text');
+        game.printCommand('actual command');
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'actual text', type: 'normal' },
+                { text: 'actual command', type: 'command' }
+            ]
+        });
+
+        game.print('');
+        game.printCommand('  ');
+        assert.deepEqual(game.state.out, {
+            texts: [
+                { text: 'Here the adventure begins', type: 'normal' },
+                { text: 'actual text', type: 'normal' },
+                { text: 'actual command', type: 'command' }
+            ]
+        });
+    });
+
     it('should allow resetting action', () => {
         const game = makeGame();
         game.run();

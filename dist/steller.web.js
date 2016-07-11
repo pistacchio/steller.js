@@ -327,6 +327,11 @@ var Steller = {
         }, {
             key: 'print',
             value: function print(text, type) {
+                if (_.trim(text) === '') {
+                    this.refreshState();
+                    return;
+                }
+
                 this.state.out = {
                     texts: this.state.out.texts.concat([{
                         text: text,
@@ -338,6 +343,11 @@ var Steller = {
         }, {
             key: 'printCommand',
             value: function printCommand(text) {
+                if (_.trim(text) === '') {
+                    this.refreshState();
+                    return;
+                }
+
                 this.print(text, 'command');
                 this.everyturn();
                 this.refreshState();
@@ -837,10 +847,15 @@ Steller.Properties = {
                     get text() {
                         var newState = i + 1 < options.states.length ? i + 1 : 0;
                         if ('beforeStateChange' in options) {
-                            newState = options.beforeStateChange(newState, i) || newState;
+                            var returnedState = options.beforeStateChange(newState, i);
+                            newState = returnedState !== undefined ? returnedState : newState;
                         }
-                        target.vars[stateName] = newState;
-                        return state.text || options.text;
+                        if (newState !== i) {
+                            target.vars[stateName] = newState;
+                            return state.text || options.text;
+                        } else {
+                            return '';
+                        }
                     },
                     get available() {
                         return options.available !== false && target.vars[stateName] === i;

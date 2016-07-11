@@ -261,6 +261,11 @@ const Steller = {
         }
 
         print (text, type) {
+            if (_.trim(text) === '') {
+                this.refreshState();
+                return;
+            }
+
             this.state.out = {
                 texts: this.state.out.texts.concat([{
                     text: text,
@@ -271,6 +276,11 @@ const Steller = {
         }
 
         printCommand (text) {
+            if (_.trim(text) === '') {
+                this.refreshState();
+                return;
+            }
+
             this.print(text, 'command');
             this.everyturn();
             this.refreshState();
