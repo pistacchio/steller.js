@@ -25,8 +25,10 @@ const game = new Steller.Web.Game({
                 street is to the north, and there are doorways south and west.`,
             exits: {
                 North: "You've only just arrived, and besides, the weather outside seems to be getting worse",
-                get South () {
-                    return game.objectInInventory('cloak') ? 'darkBar' : 'bar';
+                South: {
+                    get text () {
+                        return game.objectInInventory('cloak') ? 'darkBar' : 'bar';
+                    }
                 },
                 West: 'cloakroom'
             }
@@ -61,10 +63,26 @@ const game = new Steller.Web.Game({
                 get East () { return darkWalking(); }
             },
             actions: {
-                get Examine () { return darkWarning(); },
-                get Wait () { return darkWarning(); },
-                get 'Turn on the light' () { return darkWarning(); },
-                get Search () { return darkWarning(); }
+                Examine: {
+                    get text () {
+                        return darkWarning();
+                    }
+                },
+                Wait: {
+                    get text () {
+                        return darkWarning();
+                    }
+                },
+                'Turn on the light': {
+                    get text () {
+                        return darkWarning();
+                    }
+                },
+                'Search': {
+                    get text () {
+                        return darkWarning();
+                    }
+                }
             }
         }
     },
@@ -162,9 +180,7 @@ const game = new Steller.Web.Game({
         }
     },
     actions: {
-         get Wait () {
-             return 'You wait for a little while';
-         }
+        Wait: 'You wait for a little while'
     }
 }, $('#container'));
 
