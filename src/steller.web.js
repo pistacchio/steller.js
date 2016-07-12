@@ -28,96 +28,116 @@ Steller.Web = {
             $container.html(`
                 <style>
                     .steller {
-                        width: 100%;
-                        height: 400px;
-                        display: flex;
-                        flex-direction: column;
-                        border: 1px solid #ccc;
-                    }
-                    .steller .main-container {
-                        display: flex;
-                        height: 100%;
-                    }
-                    .steller .header {
-                        width: 100%;
-                        height: 20px;
-                        background: #eee;
-                        margin-bottom: 5px;
-                    }
-                    .steller .footer {
-                        width: 100%;
-                        height: 20px;
-                        background: #eee;
-                        margin-top: 5px;
-                    }
-                    .steller .output {
-                        width: 50%;
-                        height: 100%;
-                        background: #eee;
-                        margin-right: 5px;
-                        overflow: auto;
-                    }
-                    .steller .sidebar {
-                        height: 100%;
-                        width: 50%;
-                        display: flex;
+                        width:          100%;
+                        height:         100%;
+                        min-height:     100%;
+                        overflow:       auto;
+                        display:        flex;
                         flex-direction: column;
                     }
-                    .steller .action,
-                    .steller .main,
-                    .steller .inventory {
-                        flex-grow: 1;
-                        background: #eee;
-                        overflow: auto;
-                    }
-                    .steller .action, .main {
-                        margin-bottom: 5px;
-                    }
-
-                    .steller .main h3 {
+                    .steller ul {
                         margin: 0;
                     }
-
-                    .steller .main .exits,
-                    .steller .main .objects,
-                    .steller .main .actions,
-                    .steller .action .actions,
-                    .steller .inventory .objects {
+                    .steller ul li {
                         list-style-type: none;
-                        padding: 0 0 0 1em;
-                        margin: 0;
-                    }
-                    .steller .main .exits li,
-                    .steller .main .actions li,
-                    .steller .action .actions li {
-                        display: inline-block;
+                        padding:         0 0 0 0.5em;
                     }
 
-                    .steller .main a,
-                    .steller .inventory a,
-                    .steller .action .actions a {
-                        text-decoration: none;
-                        display: inline-block;
-                        margin: 0.1em 0.5em 0.1em 0.5em;
-                        padding: 0.2em;
-                        border: 1px solid #888;
-                        border-radius: 0.2em;
-                        vertical-align: middle;
+                    .steller .header,
+                    .steller .footer {
+                        height:     2em;
+                        background: #F6F6F6;
+                        overflow:   auto;
+                        padding:    0.3em;
                     }
-
-                    .steller .output .command {
-                        margin-top: 1em;
-                    }
-
                     .steller .header .title {
                         float: left;
                     }
                     .steller .header .score {
                         float: right;
                     }
+                    .steller .main .exits li,
+                    .steller .main .actions li,
+                    .steller .action .actions li {
+                        display: inline-block;
+                    }
+                    .steller .main a,
+                    .steller .inventory a,
+                    .steller .action .actions a {
+                        text-decoration: none;
+                        display:        inline-block;
+                        margin:         0.1em 0.5em 0.1em 0.5em;
+                        padding:        0.2em !important;
+                        border:         1px solid #888;
+                        border-radius:  0.2em;
+                        vertical-align: middle;
+                    }
+                    .steller .main-container {
+                        flex-grow:      1;
+                        display:        flex;
+                        flex-direction: row;
+                    }
+                    .steller .main-container .output {
+                        width:      40%;
+                        background: #EBEBEB;
+                        overflow-y: scroll;
+                        padding:    1em;
+                    }
+                    .steller .main-container .sidebar {
+                        width:      60%;
+                        background: #E5E5E5;
+                        overflow-y: scroll;
+                    }
+                    .steller .main-container .sidebar > div {
+                        display: block;
+                        margin:  0;
+                    }
+                    .steller .main-container .sidebar .action {
+                        background: #DCDCDC;
+                        padding:    1em;
+                    }
+                    .steller .main-container .sidebar .action:empty {
+                        // display: none;
+                    }
+                    .steller .main-container .sidebar .main {
+                        background: #D5D5D5;
+                        padding:    1em;
 
+                    }
+                    .steller .main-container .sidebar .inventory {
+                        background: #CECECE;
+                        padding:    1em;
+                    }
+                    .steller .main-container .sidebar .inventory:empty {
+                        // display: none;
+                    }
                     .steller .footer a {
                         margin-right: 15px;
+                    }
+                    .steller .output .command {
+                        margin-top: 1em;
+                    }
+                    .steller .main h3 {
+                        margin: 0;
+                    }
+
+                    @media (max-width: 35em) {
+                        .steller .main-container {
+                            flex-direction: column;
+                        }
+                        .steller .main-container .output {
+                            width:  100%;
+                            height: 50%;
+                        }
+                        .steller .main-container .sidebar {
+                            width:  100%;
+                            height: 50%;
+                        }
+                        .steller .header,
+                        .steller .footer {
+                            padding: 0.5em;
+                        }
+
                     }
                 </style>
 
@@ -236,7 +256,7 @@ Steller.Web = {
                         }
                     }
 
-                    $output.scrollTop($output.get(0).scrollHeight);
+                    $output.delay(300).animate({scrollTop: $output.get(0).scrollHeight}, 500);
                 }
             });
 
@@ -253,6 +273,7 @@ Steller.Web = {
                         `);
 
                         self.addObjects(val.objects, $inventory.find('.objects'));
+                        $inventory.show();
                     }
                 }
             });
