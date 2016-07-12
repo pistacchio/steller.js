@@ -22,8 +22,10 @@ Steller.Lang.it.ui = {
 
 Steller.Web = {
     Game: class extends Steller.Game {
-        constructor (options, $container) {
+        constructor (options, $container, immediateUpdate=false) {
             super(options);
+
+            this.TIMEOUT = 50;
 
             $container.html(`
                 <style>
@@ -92,11 +94,11 @@ Steller.Web = {
                         display: block;
                         margin:  0;
                     }
-                    .steller .main-container .sidebar .action {
+                    .steller .main-container .sidebar > .action {
                         background: #DCDCDC;
                         padding:    1em;
                     }
-                    .steller .main-container .sidebar .action:empty {
+                    .steller .main-container .sidebar > .action:empty {
                         display: none;
                     }
                     .steller .main-container .sidebar .main {
@@ -107,9 +109,10 @@ Steller.Web = {
                     .steller .main-container .sidebar .inventory {
                         background: #CECECE;
                         padding:    1em;
+                        display:    none;
                     }
                     .steller .main-container .sidebar .inventory:empty {
-                        display: none;
+                        // display: none;
                     }
                     .steller .footer a {
                         margin-right: 15px;
@@ -175,7 +178,10 @@ Steller.Web = {
             };
             let _action =    {};
             let _inventory = {};
-            let _end = false;
+
+            let actionUpdate = false;
+            let mainUpdate = false;
+            let inventoryUpdate = false;
 
             const footerSave = $(`<a href="#">${self.texts.ui.SAVE}</a>`).on('click', () => {
                 localStorage.setItem('gamedata', this.save(true));
@@ -190,44 +196,8 @@ Steller.Web = {
                 get: () => _main,
                 set: val => {
                     _main = val;
-
-                    $main.html(`
-                        <h2 class="name">${val.name}</h2>
-                        <p>${val.description}</p>
-                    `);
-
-                    if (val.exits.length > 0) {
-                        $main.append(`
-                            <h3 class="section-header">${self.texts.ui.EXITS}:</h3>
-                            <ul class="exits"></ul>`
-                        );
-
-                        for (let exit of val.exits) {
-                            const $anchor = $(`<li><a href="#">${exit.name}</a></li>`).on('click', exit.text);
-                            $main.find('.exits').append($anchor);
-                        }
-                    }
-
-                    if (val.objects.length > 0) {
-                        $main.append(`
-                            <h3 class="section-header">${self.texts.ui.YOU_SEE}:</h3>
-                            <ul class="objects"></ul>
-                        `);
-
-                        self.addObjects(val.objects, $main.find('.objects'));
-                    }
-
-                    if (val.actions.length > 0) {
-                        $main.append(`
-                            <h3 class="section-header">${self.texts.ui.ACTIONS}:</h3>
-                            <ul class="actions"></ul>
-                        `);
-
-                        for (let action of val.actions) {
-                            const $anchor = $(`<li><a href="#">${action.name}</a></li>`).on('click', action.text);
-                            $main.find('.actions').append($anchor);
-                        }
-                    }
+                    mainUpdate = true;
+                    if (immediateUpdate) updateUi();
                 }
             });
 
@@ -256,7 +226,7 @@ Steller.Web = {
                         }
                     }
 
-                    $output.stop().animate({scrollTop: $output.get(0).scrollHeight}, 500);
+                    $output.stop().animate({scrollTop: $output.get(0).scrollHeight}, 300);
                 }
             });
 
@@ -264,29 +234,8 @@ Steller.Web = {
                 get: () => _out,
                 set: val => {
                     _inventory = val;
-
-                    $inventory.html('');
-                    if (val.objects.length > 0) {
-                        $inventory.append(`
-                            <h2>${self.texts.ui.INVENTORY}:</h2>
-                            <ul class="objects"></ul>
-                        `);
-
-                        self.addObjects(val.objects, $inventory.find('.objects'));
-                    }
-                }
-            });
-
-            Object.defineProperty(this.state, 'end', {
-                get: () => _end,
-                set: val => {
-                    _end = val;
-
-                    if (val === true) {
-                        $action.html('');
-                        $main.html('');
-                        $inventory.html('');
-                    }
+                    inventoryUpdate = true;
+                    if (immediateUpdate) updateUi();
                 }
             });
 
@@ -304,24 +253,124 @@ Steller.Web = {
             Object.defineProperty(this.state, 'action', {
                 get: () => _header,
                 set: val => {
-                    _header = val;
-                    $action.html('');
-                    if (val.title) {
-                        $action.append(`<h2>${val.title}</h2>`);
+                    _action = val;
+                    actionUpdate = true;
+                    if (immediateUpdate) updateUi();
+                }
+            });
+
+            function updateUi () {
+                if (mainUpdate) {
+                    mainUpdate = false;
+
+                    let oldHeight = $main.height();
+                    $main.html(`
+                        <h2 class="name">${_main.name}</h2>
+                        <p>${_main.description}</p>
+                    `);
+
+                    if (_main.exits.length > 0) {
+                        $main.append(`
+                            <h3 class="section-header">${self.texts.ui.EXITS}:</h3>
+                            <ul class="exits"></ul>`
+                        );
+
+                        for (let exit of _main.exits) {
+                            const $anchor = $(`<li><a href="#">${exit.name}</a></li>`).on('click', exit.text);
+                            $main.find('.exits').append($anchor);
+                        }
                     }
 
-                    if (val.actions) {
-                        $action.append(`
+                    if (_main.objects.length > 0) {
+                        $main.append(`
+                            <h3 class="section-header">${self.texts.ui.YOU_SEE}:</h3>
+                            <ul class="objects"></ul>
+                        `);
+
+                        self.addObjects(_main.objects, $main.find('.objects'));
+                    }
+
+                    if (_main.actions.length > 0) {
+                        $main.append(`
+                            <h3 class="section-header">${self.texts.ui.ACTIONS}:</h3>
                             <ul class="actions"></ul>
                         `);
 
-                        for (let action of val.actions) {
+                        for (let action of _main.actions) {
                             const $anchor = $(`<li><a href="#">${action.name}</a></li>`).on('click', action.text);
-                            $action.find('.actions').append($anchor);
+                            $main.find('.actions').append($anchor);
                         }
                     }
+
+                    let newHeight = $main.height();
+                    $main.height(oldHeight);
+                    $main.stop().animate({height: newHeight}, 300, () => {
+                        $main.height('auto');
+                    });
                 }
-            });
+
+                if (actionUpdate) {
+                    actionUpdate = false;
+
+                    if (_.isEmpty(_action)) {
+                        $action.stop().slideUp(300, () => {
+                            $action.html('');
+                        });
+                    } else {
+                        let oldHeight = $action.height();
+                        $action.html('');
+                        if (_action.title) {
+                            $action.append(`<h2>${_action.title}</h2>`);
+                        }
+
+                        if (_action.actions) {
+                            $action.append(`
+                                <ul class="actions"></ul>
+                            `);
+
+                            for (let action of _action.actions) {
+                                const $anchor = $(`<li><a href="#">${action.name}</a></li>`).on('click', action.text);
+                                $action.find('.actions').append($anchor);
+                            }
+                        }
+
+                        let newHeight = $action.height();
+                        $action.height(oldHeight);
+                        $action.stop().show().animate({height: newHeight}, 300, () => {
+                            $action.height('auto');
+                        });
+                    }
+                }
+
+                if (inventoryUpdate) {
+                    inventoryUpdate = false;
+
+                    if (_.isEmpty(_inventory.objects)) {
+                        $inventory.stop().slideUp(300, () => {
+                            $inventory.html('');
+                        });
+                    } else {
+                        let oldHeight = $inventory.height();
+                        $inventory.html('');
+                        if (_inventory.objects.length > 0) {
+                            $inventory.append(`
+                                <h2>${self.texts.ui.INVENTORY}:</h2>
+                                <ul class="objects"></ul>
+                            `);
+
+                            self.addObjects(_inventory.objects, $inventory.find('.objects'));
+                        }
+
+                        let newHeight = $inventory.height();
+                        $inventory.height(oldHeight);
+                        $inventory.stop().show().animate({height: newHeight}, 300, () => {
+                            $inventory.height('auto');
+                        });
+                    }
+                }
+
+            }
+            setInterval(updateUi, this.TIMEOUT);
 
         }
 

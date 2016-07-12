@@ -382,6 +382,7 @@ const Steller = {
 
         end () {
             this.state.end = true;
+            this.lockInteraction();
         }
 
         save (string=false) {

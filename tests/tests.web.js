@@ -48,7 +48,7 @@ function makeGame () {
         inventory: [
             'object2'
         ]
-    }, $('#container'));
+    }, $('#container'), true);
     return game;
 }
 

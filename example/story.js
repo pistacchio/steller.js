@@ -146,13 +146,14 @@ const game = new Steller.Web.Game({
                 Read: {
                     command: 'read the message',
                     get text () {
-                        game.end();
                         if (game.objects.message.vars.damages < 2) {
-                            game.setScore(game.score + 1);
                             return 'The message, neatly marked in the sawdust, reads...<br> <div style="text-align: center;">You have won</span>';
                         } else {
                             return 'The message has been carelessly trampled, making it difficult to read. You can just distinguish the words<br> <div style="text-align: center;">You have lost</span>';
                         }
+                    },
+                    afterText: () => {
+                        game.end();
                     }
                 }
             },
