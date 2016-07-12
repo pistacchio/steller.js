@@ -97,7 +97,7 @@ Steller.Web = {
                         padding:    1em;
                     }
                     .steller .main-container .sidebar .action:empty {
-                        // display: none;
+                        display: none;
                     }
                     .steller .main-container .sidebar .main {
                         background: #D5D5D5;
@@ -109,7 +109,7 @@ Steller.Web = {
                         padding:    1em;
                     }
                     .steller .main-container .sidebar .inventory:empty {
-                        // display: none;
+                        display: none;
                     }
                     .steller .footer a {
                         margin-right: 15px;
@@ -256,7 +256,7 @@ Steller.Web = {
                         }
                     }
 
-                    $output.delay(300).animate({scrollTop: $output.get(0).scrollHeight}, 500);
+                    $output.stop().animate({scrollTop: $output.get(0).scrollHeight}, 500);
                 }
             });
 
@@ -273,7 +273,6 @@ Steller.Web = {
                         `);
 
                         self.addObjects(val.objects, $inventory.find('.objects'));
-                        $inventory.show();
                     }
                 }
             });
