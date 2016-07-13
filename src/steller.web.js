@@ -236,7 +236,7 @@ Steller.Web = {
             });
 
             Object.defineProperty(this.state, 'inventory', {
-                get: () => _out,
+                get: () => _inventory,
                 set: val => {
                     _inventory = val;
                     inventoryUpdate = true;
@@ -256,7 +256,7 @@ Steller.Web = {
             });
 
             Object.defineProperty(this.state, 'action', {
-                get: () => _header,
+                get: () => _action,
                 set: val => {
                     _action = val;
                     actionUpdate = true;
@@ -318,6 +318,7 @@ Steller.Web = {
                     actionUpdate = false;
 
                     if (_.isEmpty(_action)) {
+                        if (immediateUpdate) $action.html('');
                         $action.stop().slideUp(300, () => {
                             $action.html('');
                         });
@@ -351,6 +352,7 @@ Steller.Web = {
                     inventoryUpdate = false;
 
                     if (_.isEmpty(_inventory.objects)) {
+                        if (immediateUpdate) $inventory.html('');
                         $inventory.stop().slideUp(300, () => {
                             $inventory.html('');
                         });

@@ -104,6 +104,9 @@ describe('Steller web game', () => {
         assert.equal($('#container .main .actions').text(), 'Wait');
         assert.equal($('#container .main .objects').text(), 'Object 1TakeTalk');
         assert.equal($('#container .inventory .objects').text(), 'Object 2');
+        game.moveObjectToLocation('object2');
+        game.updateInventory();
+        assert.equal($('#container .inventory .objects').text(), '');
     });
 
     it('should execute location actions and navigate', function () {
@@ -136,6 +139,9 @@ describe('Steller web game', () => {
         assert.equal($('#container .sidebar > .action').text(), '');
         $('#container .main .objects .action').eq(1).click();
         assert.notEqual($('#container .sidebar > .action').text(), '');
+
+        $('#container .sidebar > .action a').eq(1).click();
+        assert.equal($('#container .sidebar > .action').text(), '');
     });
 
     it('should end the game', function () {
