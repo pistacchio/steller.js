@@ -126,15 +126,15 @@ Steller.Web = {
 
                     @media (max-width: 35em) {
                         .steller .main-container {
+                            width: auto;
                             flex-direction: column;
                         }
                         .steller .main-container .output {
-                            width:  100%;
-                            height: 50%;
+                            width:  93vw;
+                            height: 30vh;
                         }
                         .steller .main-container .sidebar {
-                            width:  100%;
-                            height: 50%;
+                            width: 100%;
                         }
                         .steller .header,
                         .steller .footer {
