@@ -36,13 +36,14 @@ Steller.Web = {
                         overflow:       auto;
                         display:        flex;
                         flex-direction: column;
+                        background:     #F6F6F6;
                     }
                     .steller ul {
-                        margin: 0;
+                        margin:  0;
+                        padding: 0 0 0 0.5em;
                     }
                     .steller ul li {
                         list-style-type: none;
-                        padding:         0 0 0 0.5em;
                     }
 
                     .steller .header,
@@ -125,9 +126,13 @@ Steller.Web = {
                     }
 
                     @media (max-width: 35em) {
+                        .steller {
+                            display: block;
+                        }
                         .steller .main-container {
                             width: auto;
                             flex-direction: column;
+                            display: block;
                         }
                         .steller .main-container .output {
                             width:  93vw;

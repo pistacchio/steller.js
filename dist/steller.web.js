@@ -473,6 +473,7 @@ var Steller = {
             key: 'end',
             value: function end() {
                 this.state.end = true;
+                this.lockInteraction();
             }
         }, {
             key: 'save',
@@ -918,11 +919,15 @@ Steller.Web = {
         _inherits(Game, _Steller$Game);
 
         function Game(options, $container) {
+            var immediateUpdate = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
             _classCallCheck(this, Game);
 
             var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Game).call(this, options));
 
-            $container.html('\n                <style>\n                    .steller {\n                        width:          100%;\n                        height:         100%;\n                        min-height:     100%;\n                        overflow:       auto;\n                        display:        flex;\n                        flex-direction: column;\n                    }\n                    .steller ul {\n                        margin: 0;\n                    }\n                    .steller ul li {\n                        list-style-type: none;\n                        padding:         0 0 0 0.5em;\n                    }\n\n                    .steller .header,\n                    .steller .footer {\n                        height:     2em;\n                        background: #F6F6F6;\n                        overflow:   auto;\n                        padding:    0.3em;\n                    }\n                    .steller .header .title {\n                        float: left;\n                    }\n                    .steller .header .score {\n                        float: right;\n                    }\n                    .steller .main .exits li,\n                    .steller .main .actions li,\n                    .steller .action .actions li {\n                        display: inline-block;\n                    }\n                    .steller .main a,\n                    .steller .inventory a,\n                    .steller .action .actions a {\n                        text-decoration: none;\n                        display:        inline-block;\n                        margin:         0.1em 0.5em 0.1em 0.5em;\n                        padding:        0.2em !important;\n                        border:         1px solid #888;\n                        border-radius:  0.2em;\n                        vertical-align: middle;\n                    }\n                    .steller .main-container {\n                        flex-grow:      1;\n                        display:        flex;\n                        flex-direction: row;\n                    }\n                    .steller .main-container .output {\n                        width:      40%;\n                        background: #EBEBEB;\n                        overflow-y: scroll;\n                        padding:    1em;\n                    }\n                    .steller .main-container .sidebar {\n                        width:      60%;\n                        background: #E5E5E5;\n                        overflow-y: scroll;\n                    }\n                    .steller .main-container .sidebar > div {\n                        display: block;\n                        margin:  0;\n                    }\n                    .steller .main-container .sidebar .action {\n                        background: #DCDCDC;\n                        padding:    1em;\n                    }\n                    .steller .main-container .sidebar .action:empty {\n                        display: none;\n                    }\n                    .steller .main-container .sidebar .main {\n                        background: #D5D5D5;\n                        padding:    1em;\n\n                    }\n                    .steller .main-container .sidebar .inventory {\n                        background: #CECECE;\n                        padding:    1em;\n                    }\n                    .steller .main-container .sidebar .inventory:empty {\n                        display: none;\n                    }\n                    .steller .footer a {\n                        margin-right: 15px;\n                    }\n                    .steller .output .command {\n                        margin-top: 1em;\n                    }\n                    .steller .main h3 {\n                        margin: 0;\n                    }\n\n                    @media (max-width: 35em) {\n                        .steller .main-container {\n                            flex-direction: column;\n                        }\n                        .steller .main-container .output {\n                            width:  100%;\n                            height: 50%;\n                        }\n                        .steller .main-container .sidebar {\n                            width:  100%;\n                            height: 50%;\n                        }\n                        .steller .header,\n                        .steller .footer {\n                            padding: 0.5em;\n                        }\n\n                    }\n                </style>\n\n                <div class="steller">\n                    <div class="header">\n                        <div class="title"></div>\n                        <div class="score"></div>\n                    </div>\n                    <div class="main-container">\n                        <div class="output"></div>\n                        <div class="sidebar">\n                            <div class="action"></div>\n                            <div class="main"></div>\n                            <div class="inventory"></div>\n                        </div>\n                    </div>\n                    <div class="footer"></div>\n                </div>\n            ');
+            _this.TIMEOUT = 50;
+
+            $container.html('\n                <style>\n                    .steller {\n                        width:          100%;\n                        height:         100%;\n                        min-height:     100%;\n                        overflow:       auto;\n                        display:        flex;\n                        flex-direction: column;\n                        background:     #F6F6F6;\n                    }\n                    .steller ul {\n                        margin:  0;\n                        padding: 0 0 0 0.5em;\n                    }\n                    .steller ul li {\n                        list-style-type: none;\n                    }\n\n                    .steller .header,\n                    .steller .footer {\n                        height:     2em;\n                        background: #F6F6F6;\n                        overflow:   auto;\n                        padding:    0.3em;\n                    }\n                    .steller .header .title {\n                        float: left;\n                    }\n                    .steller .header .score {\n                        float: right;\n                    }\n                    .steller .main .exits li,\n                    .steller .main .actions li,\n                    .steller .action .actions li {\n                        display: inline-block;\n                    }\n                    .steller .main a,\n                    .steller .inventory a,\n                    .steller .action .actions a {\n                        text-decoration: none;\n                        display:        inline-block;\n                        margin:         0.1em 0.5em 0.1em 0.5em;\n                        padding:        0.2em !important;\n                        border:         1px solid #888;\n                        border-radius:  0.2em;\n                        vertical-align: middle;\n                    }\n                    .steller .main-container {\n                        flex-grow:      1;\n                        display:        flex;\n                        flex-direction: row;\n                    }\n                    .steller .main-container .output {\n                        width:      40%;\n                        background: #EBEBEB;\n                        overflow-y: scroll;\n                        padding:    1em;\n                    }\n                    .steller .main-container .sidebar {\n                        width:      60%;\n                        background: #E5E5E5;\n                        overflow-y: scroll;\n                    }\n                    .steller .main-container .sidebar > div {\n                        display: block;\n                        margin:  0;\n                    }\n                    .steller .main-container .sidebar > .action {\n                        background: #DCDCDC;\n                        padding:    1em;\n                    }\n                    .steller .main-container .sidebar > .action:empty {\n                        display: none;\n                    }\n                    .steller .main-container .sidebar .main {\n                        background: #D5D5D5;\n                        padding:    1em;\n\n                    }\n                    .steller .main-container .sidebar .inventory {\n                        background: #CECECE;\n                        padding:    1em;\n                        display:    none;\n                    }\n                    .steller .main-container .sidebar .inventory:empty {\n                        // display: none;\n                    }\n                    .steller .footer a {\n                        margin-right: 15px;\n                    }\n                    .steller .output .command {\n                        margin-top: 1em;\n                    }\n                    .steller .main h3 {\n                        margin: 0;\n                    }\n\n                    @media (max-width: 35em) {\n                        .steller {\n                            display: block;\n                        }\n                        .steller .main-container {\n                            width: auto;\n                            flex-direction: column;\n                            display: block;\n                        }\n                        .steller .main-container .output {\n                            width:  93vw;\n                            height: 30vh;\n                        }\n                        .steller .main-container .sidebar {\n                            width: 100%;\n                        }\n                        .steller .header,\n                        .steller .footer {\n                            padding: 0.5em;\n                        }\n\n                    }\n                </style>\n\n                <div class="steller">\n                    <div class="header">\n                        <div class="title"></div>\n                        <div class="score"></div>\n                    </div>\n                    <div class="main-container">\n                        <div class="output"></div>\n                        <div class="sidebar">\n                            <div class="action"></div>\n                            <div class="main"></div>\n                            <div class="inventory"></div>\n                        </div>\n                    </div>\n                    <div class="footer"></div>\n                </div>\n            ');
 
             var $header = $container.find('.header');
             var $output = $container.find('.output');
@@ -941,7 +946,10 @@ Steller.Web = {
             };
             var _action = {};
             var _inventory = {};
-            var _end = false;
+
+            var actionUpdate = false;
+            var mainUpdate = false;
+            var inventoryUpdate = false;
 
             var footerSave = $('<a href="#">' + self.texts.ui.SAVE + '</a>').on('click', function () {
                 localStorage.setItem('gamedata', _this.save(true));
@@ -958,74 +966,8 @@ Steller.Web = {
                 },
                 set: function set(val) {
                     _main = val;
-
-                    $main.html('\n                        <h2 class="name">' + val.name + '</h2>\n                        <p>' + val.description + '</p>\n                    ');
-
-                    if (val.exits.length > 0) {
-                        $main.append('\n                            <h3 class="section-header">' + self.texts.ui.EXITS + ':</h3>\n                            <ul class="exits"></ul>');
-
-                        var _iteratorNormalCompletion = true;
-                        var _didIteratorError = false;
-                        var _iteratorError = undefined;
-
-                        try {
-                            for (var _iterator = val.exits[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                                var exit = _step.value;
-
-                                var $anchor = $('<li><a href="#">' + exit.name + '</a></li>').on('click', exit.text);
-                                $main.find('.exits').append($anchor);
-                            }
-                        } catch (err) {
-                            _didIteratorError = true;
-                            _iteratorError = err;
-                        } finally {
-                            try {
-                                if (!_iteratorNormalCompletion && _iterator.return) {
-                                    _iterator.return();
-                                }
-                            } finally {
-                                if (_didIteratorError) {
-                                    throw _iteratorError;
-                                }
-                            }
-                        }
-                    }
-
-                    if (val.objects.length > 0) {
-                        $main.append('\n                            <h3 class="section-header">' + self.texts.ui.YOU_SEE + ':</h3>\n                            <ul class="objects"></ul>\n                        ');
-
-                        self.addObjects(val.objects, $main.find('.objects'));
-                    }
-
-                    if (val.actions.length > 0) {
-                        $main.append('\n                            <h3 class="section-header">' + self.texts.ui.ACTIONS + ':</h3>\n                            <ul class="actions"></ul>\n                        ');
-
-                        var _iteratorNormalCompletion2 = true;
-                        var _didIteratorError2 = false;
-                        var _iteratorError2 = undefined;
-
-                        try {
-                            for (var _iterator2 = val.actions[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                                var action = _step2.value;
-
-                                var _$anchor = $('<li><a href="#">' + action.name + '</a></li>').on('click', action.text);
-                                $main.find('.actions').append(_$anchor);
-                            }
-                        } catch (err) {
-                            _didIteratorError2 = true;
-                            _iteratorError2 = err;
-                        } finally {
-                            try {
-                                if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                                    _iterator2.return();
-                                }
-                            } finally {
-                                if (_didIteratorError2) {
-                                    throw _iteratorError2;
-                                }
-                            }
-                        }
-                    }
+                    mainUpdate = true;
+                    if (immediateUpdate) updateUi();
                 }
             });
 
@@ -1037,13 +979,13 @@ Steller.Web = {
                     _out = val;
 
                     $output.html('');
-                    var _iteratorNormalCompletion3 = true;
-                    var _didIteratorError3 = false;
-                    var _iteratorError3 = undefined;
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
 
                     try {
-                        for (var _iterator3 = val.texts[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                            var text = _step3.value;
+                        for (var _iterator = val.texts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var text = _step.value;
 
                             // console.log(text.type);
                             if (text.type in _this.formatters) {
@@ -1063,21 +1005,21 @@ Steller.Web = {
                             }
                         }
                     } catch (err) {
-                        _didIteratorError3 = true;
-                        _iteratorError3 = err;
+                        _didIteratorError = true;
+                        _iteratorError = err;
                     } finally {
                         try {
-                            if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                                _iterator3.return();
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
                             }
                         } finally {
-                            if (_didIteratorError3) {
-                                throw _iteratorError3;
+                            if (_didIteratorError) {
+                                throw _iteratorError;
                             }
                         }
                     }
 
-                    $output.delay(300).animate({ scrollTop: $output.get(0).scrollHeight }, 500);
+                    $output.stop().animate({ scrollTop: $output.get(0).scrollHeight }, 300);
                 }
             });
 
@@ -1087,29 +1029,8 @@ Steller.Web = {
                 },
                 set: function set(val) {
                     _inventory = val;
-
-                    $inventory.html('');
-                    if (val.objects.length > 0) {
-                        $inventory.append('\n                            <h2>' + self.texts.ui.INVENTORY + ':</h2>\n                            <ul class="objects"></ul>\n                        ');
-
-                        self.addObjects(val.objects, $inventory.find('.objects'));
-                        $inventory.show();
-                    }
-                }
-            });
-
-            Object.defineProperty(_this.state, 'end', {
-                get: function get() {
-                    return _end;
-                },
-                set: function set(val) {
-                    _end = val;
-
-                    if (val === true) {
-                        $action.html('');
-                        $main.html('');
-                        $inventory.html('');
-                    }
+                    inventoryUpdate = true;
+                    if (immediateUpdate) updateUi();
                 }
             });
 
@@ -1131,43 +1052,169 @@ Steller.Web = {
                     return _header;
                 },
                 set: function set(val) {
-                    _header = val;
-                    $action.html('');
-                    if (val.title) {
-                        $action.append('<h2>' + val.title + '</h2>');
-                    }
+                    _action = val;
+                    actionUpdate = true;
+                    if (immediateUpdate) updateUi();
+                }
+            });
 
-                    if (val.actions) {
-                        $action.append('\n                            <ul class="actions"></ul>\n                        ');
+            function updateUi() {
+                if (mainUpdate) {
+                    mainUpdate = false;
 
-                        var _iteratorNormalCompletion4 = true;
-                        var _didIteratorError4 = false;
-                        var _iteratorError4 = undefined;
+                    var oldHeight = $main.height();
+                    $main.html('\n                        <h2 class="name">' + _main.name + '</h2>\n                        <p>' + _main.description + '</p>\n                    ');
+
+                    if (_main.exits.length > 0) {
+                        $main.append('\n                            <h3 class="section-header">' + self.texts.ui.EXITS + ':</h3>\n                            <ul class="exits"></ul>');
+
+                        var _iteratorNormalCompletion2 = true;
+                        var _didIteratorError2 = false;
+                        var _iteratorError2 = undefined;
 
                         try {
-                            for (var _iterator4 = val.actions[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                                var action = _step4.value;
+                            for (var _iterator2 = _main.exits[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                                var exit = _step2.value;
 
-                                var $anchor = $('<li><a href="#">' + action.name + '</a></li>').on('click', action.text);
-                                $action.find('.actions').append($anchor);
+                                var $anchor = $('<li><a href="#">' + exit.name + '</a></li>').on('click', exit.text);
+                                $main.find('.exits').append($anchor);
                             }
                         } catch (err) {
-                            _didIteratorError4 = true;
-                            _iteratorError4 = err;
+                            _didIteratorError2 = true;
+                            _iteratorError2 = err;
                         } finally {
                             try {
-                                if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                    _iterator4.return();
+                                if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                    _iterator2.return();
                                 }
                             } finally {
-                                if (_didIteratorError4) {
-                                    throw _iteratorError4;
+                                if (_didIteratorError2) {
+                                    throw _iteratorError2;
                                 }
                             }
                         }
                     }
+
+                    if (_main.objects.length > 0) {
+                        $main.append('\n                            <h3 class="section-header">' + self.texts.ui.YOU_SEE + ':</h3>\n                            <ul class="objects"></ul>\n                        ');
+
+                        self.addObjects(_main.objects, $main.find('.objects'));
+                    }
+
+                    if (_main.actions.length > 0) {
+                        $main.append('\n                            <h3 class="section-header">' + self.texts.ui.ACTIONS + ':</h3>\n                            <ul class="actions"></ul>\n                        ');
+
+                        var _iteratorNormalCompletion3 = true;
+                        var _didIteratorError3 = false;
+                        var _iteratorError3 = undefined;
+
+                        try {
+                            for (var _iterator3 = _main.actions[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                                var action = _step3.value;
+
+                                var _$anchor = $('<li><a href="#">' + action.name + '</a></li>').on('click', action.text);
+                                $main.find('.actions').append(_$anchor);
+                            }
+                        } catch (err) {
+                            _didIteratorError3 = true;
+                            _iteratorError3 = err;
+                        } finally {
+                            try {
+                                if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                                    _iterator3.return();
+                                }
+                            } finally {
+                                if (_didIteratorError3) {
+                                    throw _iteratorError3;
+                                }
+                            }
+                        }
+                    }
+
+                    var newHeight = $main.height();
+                    $main.height(oldHeight);
+                    $main.stop().animate({ height: newHeight }, 300, function () {
+                        $main.height('auto');
+                    });
                 }
-            });
+
+                if (actionUpdate) {
+                    actionUpdate = false;
+
+                    if (_.isEmpty(_action)) {
+                        $action.stop().slideUp(300, function () {
+                            $action.html('');
+                        });
+                    } else {
+                        var _oldHeight = $action.height();
+                        $action.html('');
+                        if (_action.title) {
+                            $action.append('<h2>' + _action.title + '</h2>');
+                        }
+
+                        if (_action.actions) {
+                            $action.append('\n                                <ul class="actions"></ul>\n                            ');
+
+                            var _iteratorNormalCompletion4 = true;
+                            var _didIteratorError4 = false;
+                            var _iteratorError4 = undefined;
+
+                            try {
+                                for (var _iterator4 = _action.actions[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                                    var _action2 = _step4.value;
+
+                                    var _$anchor2 = $('<li><a href="#">' + _action2.name + '</a></li>').on('click', _action2.text);
+                                    $action.find('.actions').append(_$anchor2);
+                                }
+                            } catch (err) {
+                                _didIteratorError4 = true;
+                                _iteratorError4 = err;
+                            } finally {
+                                try {
+                                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                        _iterator4.return();
+                                    }
+                                } finally {
+                                    if (_didIteratorError4) {
+                                        throw _iteratorError4;
+                                    }
+                                }
+                            }
+                        }
+
+                        var _newHeight = $action.height();
+                        $action.height(_oldHeight);
+                        $action.stop().show().animate({ height: _newHeight }, 300, function () {
+                            $action.height('auto');
+                        });
+                    }
+                }
+
+                if (inventoryUpdate) {
+                    inventoryUpdate = false;
+
+                    if (_.isEmpty(_inventory.objects)) {
+                        $inventory.stop().slideUp(300, function () {
+                            $inventory.html('');
+                        });
+                    } else {
+                        var _oldHeight2 = $inventory.height();
+                        $inventory.html('');
+                        if (_inventory.objects.length > 0) {
+                            $inventory.append('\n                                <h2>' + self.texts.ui.INVENTORY + ':</h2>\n                                <ul class="objects"></ul>\n                            ');
+
+                            self.addObjects(_inventory.objects, $inventory.find('.objects'));
+                        }
+
+                        var _newHeight2 = $inventory.height();
+                        $inventory.height(_oldHeight2);
+                        $inventory.stop().show().animate({ height: _newHeight2 }, 300, function () {
+                            $inventory.height('auto');
+                        });
+                    }
+                }
+            }
+            setInterval(updateUi, _this.TIMEOUT);
 
             return _this;
         }
