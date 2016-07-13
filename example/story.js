@@ -152,7 +152,7 @@ const game = new Steller.Web.Game({
                             return 'The message has been carelessly trampled, making it difficult to read. You can just distinguish the words<br> <div style="text-align: center;">You have lost</span>';
                         }
                     },
-                    afterText: () => {
+                    afterText: function () {
                         game.end();
                     }
                 }
