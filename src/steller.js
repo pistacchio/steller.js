@@ -89,10 +89,10 @@ const Steller = {
                         }
                     } else {
                         let locationDescriptor = Object.getOwnPropertyDescriptor(location.objects[object], 'location');
-                        if (locationDescriptor && locationDescriptor.get === undefined) {
-                            location.objects[object].location = location.objects[object].location || name;
-                            this.objects[object] = location.objects[object];
+                        if (!locationDescriptor) {
+                            location.objects[object].location = name;
                         }
+                        this.objects[object] = location.objects[object];
                     }
                 }
 
