@@ -100,8 +100,11 @@ var Steller = {
                             actions: _defineProperty({}, _this.texts.EXAMINE, location.objects[object])
                         };
                     } else {
-                        location.objects[object].location = location.objects[object].location || name;
-                        _this.objects[object] = location.objects[object];
+                        var locationDescriptor = Object.getOwnPropertyDescriptor(location.objects[object], 'location');
+                        if (locationDescriptor && locationDescriptor.get === undefined) {
+                            location.objects[object].location = location.objects[object].location || name;
+                            _this.objects[object] = location.objects[object];
+                        }
                     }
                 }
 
